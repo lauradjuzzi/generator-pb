@@ -58,6 +58,7 @@ class UserController extends Controller
         return view('admin.users.edit', compact('user'));
     }
 
+
     public function update(Request $request, User $user)
     {
         $validated = $request->validate([
@@ -81,10 +82,20 @@ class UserController extends Controller
                 'required',
                 \Illuminate\Validation\Rule::in(['admin', 'staff']),
             ],
+            'password' => ['nullable', 'string', 'min:8'],
         ]);
 
         if ($user->id === Auth::id()) {
             $validated['role'] = $user->role;
+        }
+
+        // Password hanya diubah jika kolom diisi.
+        if (! empty($validated['password'])) {
+            $validated['password'] = \Illuminate\Support\Facades\Hash::make(
+                $validated['password']
+            );
+        } else {
+            unset($validated['password']);
         }
 
         $user->update($validated);
@@ -93,6 +104,7 @@ class UserController extends Controller
             ->route('admin.users.index')
             ->with('success', 'Data akun berhasil diperbarui.');
     }
+
 
 
 

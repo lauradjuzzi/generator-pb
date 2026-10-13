@@ -1,11 +1,9 @@
+@extends('layouts.app')
 
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kelola User | Generator PB</title>
+@section('title', 'Kelola Pengguna')
+@section('page-label', 'Administrasi Pengguna')
 
+@push('styles')
     <style>
         :root {
             --teal: #286963;
@@ -24,19 +22,11 @@
             box-sizing: border-box;
         }
 
-        body {
-            margin: 0;
-            padding: 36px 24px;
-            background: var(--beige);
-            color: var(--text);
-            font-family: "Segoe UI", Arial, sans-serif;
-            font-size: 14px;
-        }
-
         .page {
             width: 100%;
-            max-width: 1120px;
-            margin: 0 auto;
+            max-width: none;
+            margin: 0;
+            padding: 0;
         }
 
         .page-header {
@@ -310,9 +300,6 @@
         }
 
         @media (max-width: 560px) {
-            body {
-                padding: 24px 14px;
-            }
 
             .page-header {
                 align-items: flex-start;
@@ -328,7 +315,7 @@
                 padding: 17px;
             }
         }
-         
+
         .action-buttons {
             display: flex;
             align-items: center;
@@ -372,211 +359,284 @@
             height: 17px;
         }
 
+        /* Penanda kolom wajib */
+        .required-mark {
+            color: #dc2626;
+            font-weight: 700;
+        }
+
+        /* Input wajib yang kosong atau gagal validasi */
+        .field input:required:placeholder-shown,
+        .field input.is-invalid,
+        .field select.is-invalid {
+            border: 1px solid #dc2626;
+        }
+
+        /* Fokus pada kolom yang wajib diisi */
+        .field input:required:placeholder-shown:focus,
+        .field input.is-invalid:focus,
+        .field select.is-invalid:focus {
+            outline: 2px solid rgba(220, 38, 38, 0.15);
+            border-color: #dc2626;
+        }
+
+
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .password-wrapper input {
+            width: 100%;
+            padding-right: 45px;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            border: none;
+            background: transparent;
+            color: #6B7773;
+            cursor: pointer;
+        }
+
+        .toggle-password:hover {
+            color: #286963;
+        }
+
+        .error-message {
+            margin-top: 5px;
+            color: #dc2626;
+            font-size: 12px;
+        }
     </style>
-</head>
-<body>
-    <main class="page">
-        <header class="page-header">
-            <div>
-                <div class="eyebrow">SISTEM INTERNAL</div>
-                <h1>Kelola User</h1>
-                <p class="subtitle">
-                    Pengelolaan akun pengguna Generator Pemindah Pembukuan.
-                </p>
-            </div>
+@endpush
 
-            <a href="{{ route('dashboard') }}" class="back-link">
-                Kembali ke Dashboard
-            </a>
-        </header>
+@section('content')
 
-        @if (session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        @if ($errors->any())
-            <div class="alert alert-danger">
-                <strong>Periksa kembali data berikut:</strong>
-                <ul>
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        <div class="layout">
-            <section class="card card-form">
-                <div class="card-header">
-                    <h2>Tambah Akun</h2>
-                    <p>Isi informasi pengguna untuk membuat akun baru.</p>
+    <body>
+        <div class="page">
+            <header class="page-header">
+                <div>
+                    <div class="eyebrow">SISTEM INTERNAL</div>
+                    <h1>Kelola User</h1>
+                    <p class="subtitle">
+                        Pengelolaan akun pengguna Generator Pemindah Pembukuan.
+                    </p>
                 </div>
+            </header>
 
-                <div class="card-body">
-                    <form action="{{ route('admin.users.store') }}" method="POST">
-                        @csrf
-
-                        <div class="field">
-                            <label for="name">Nama Lengkap</label>
-                            <input id="name" name="name" type="text"
-                                value="{{ old('name') }}"
-                                placeholder="Masukkan nama lengkap" required>
-                        </div>
-
-                        <div class="field">
-                            <label for="username">Username</label>
-                            <input id="username" name="username" type="text"
-                                value="{{ old('username') }}"
-                                placeholder="Masukkan username"
-                                pattern="[A-Za-z0-9_-]+"
-                                title="Gunakan huruf, angka, tanda hubung, atau garis bawah."
-                                required>
-                            <div class="hint">Username harus unik.</div>
-                        </div>
-
-                        <div class="field">
-                            <label for="email">
-                                Email <span class="optional">(opsional)</span>
-                            </label>
-                            <input id="email" name="email" type="email"
-                                value="{{ old('email') }}"
-                                placeholder="nama@contoh.com">
-                        </div>
-
-                        <div class="field">
-                            <label for="password">Password Awal</label>
-                            <input id="password" name="password" type="password"
-                                minlength="8" placeholder="Minimal 8 karakter"
-                                required>
-                        </div>
-
-                        <div class="field">
-                            <label for="role">Role Pengguna</label>
-                            <select id="role" name="role" required>
-                                <option value="staff"
-                                    {{ old('role', 'staff') === 'staff' ? 'selected' : '' }}>
-                                    Staf
-                                </option>
-                                <option value="admin"
-                                    {{ old('role') === 'admin' ? 'selected' : '' }}>
-                                    Admin
-                                </option>
-                            </select>
-                        </div>
-
-                        <button type="submit" class="btn-primary">
-                            Tambah Akun
-                        </button>
-                    </form>
+            @if (session('success'))
+                <div class="alert alert-success">
+                    {{ session('success') }}
                 </div>
-            </section>
+            @endif
 
-            <section class="card">
-                <div class="card-header">
-                    <h2>Daftar Akun</h2>
-                    <p>Akun yang terdaftar pada sistem Generator PB.</p>
+            @if ($errors->any())
+                <div class="alert alert-danger">
+                    <strong>Periksa kembali data berikut:</strong>
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
                 </div>
+            @endif
 
-                <div class="card-body">
-                    <div class="table-summary">
-                        <strong>Pengguna Terdaftar</strong>
-                        <span class="count">{{ $users->count() }} akun</span>
+            <div class="layout">
+                <section class="card card-form" id="form-tambah-user">
+                    <div class="card-header">
+                        <h2>Tambah Akun</h2>
+                        <p>Isi informasi pengguna untuk membuat akun baru.</p>
                     </div>
 
-                    <div class="table-wrap">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>No.</th>
-                                    <th>Nama</th>
-                                    <th>Username</th>
-                                    <th>Email</th>
-                                    <th>Role</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($users as $user)
-                                    <tr>
-                                        <td>{{ $loop->iteration }}</td>
-                                        <td class="user-name">{{ $user->name }}</td>
-                                        <td>{{ $user->username }}</td>
-                                        <td>{{ $user->email ?: '-' }}</td>
-                                        <td>
-                                            <span class="role {{ $user->role === 'admin' ? 'role-admin' : 'role-staff' }}">
-                                                {{ $user->role === 'admin' ? 'Admin' : 'Staf' }}
-                                            </span>
-                                        </td>
-                                        
-                                        
-<td>
-    <div class="action-buttons">
-        <a href="{{ route('admin.users.edit', $user) }}"
-           class="icon-button edit-button"
-           title="Edit akun"
-           aria-label="Edit akun {{ $user->username }}">
-            <svg xmlns="http://www.w3.org/2000/svg"
-                 viewBox="0 0 24 24"
-                 fill="none"
-                 stroke="currentColor"
-                 stroke-width="2"
-                 stroke-linecap="round"
-                 stroke-linejoin="round">
-                <path d="M12 20h9"/>
-                <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"/>
-            </svg>
-        </a>
+                    <div class="card-body">
+                        <form action="{{ route('admin.users.store') }}" method="POST">
+                            @csrf
 
-        @if ($user->id !== auth()->id())
-            <form action="{{ route('admin.users.destroy', $user) }}"
-                  method="POST"
-                  onsubmit="return confirm('Yakin ingin menghapus akun {{ $user->username }}?');">
-                @csrf
-                @method('DELETE')
-
-                <button type="submit"
-                        class="icon-button delete-button"
-                        title="Hapus akun"
-                        aria-label="Hapus akun {{ $user->username }}">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                         viewBox="0 0 24 24"
-                         fill="none"
-                         stroke="currentColor"
-                         stroke-width="2"
-                         stroke-linecap="round"
-                         stroke-linejoin="round">
-                        <path d="M3 6h18"/>
-                        <path d="M8 6V4h8v2"/>
-                        <path d="m19 6-1 14H6L5 6"/>
-                        <path d="M10 11v5M14 11v5"/>
-                    </svg>
-                </button>
-            </form>
-        @endif
-    </div>
-</td>
+                            <div class="field">
+                                <label for="name">Nama Lengkap <span class="required-mark">*</span></label>
+                                <input id="name" name="name" type="text" value="{{ old('name') }}"
+                                    placeholder="Masukkan nama lengkap" required>
+                            </div>
 
 
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="6" class="empty">
-                                            Belum ada akun terdaftar.
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                            <div class="field">
+                                <label for="username">
+                                    Username <span class="required-mark">*</span>
+                                </label>
+                                <input id="username" name="username" type="text" value="{{ old('username') }}"
+                                    placeholder="Masukkan username" pattern="[A-Za-z0-9_-]+"
+                                    title="Gunakan huruf, angka, tanda hubung, atau garis bawah."
+                                    class="{{ $errors->has('username') ? 'is-invalid' : '' }}" required>
+                                <div class="hint">Username harus unik.</div>
+                                @error('username')
+                                    <div class="error-message">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+
+                            <div class="field">
+                                <label for="email">
+                                    Email <span class="optional">(opsional)</span>
+                                </label>
+                                <input id="email" name="email" type="email" value="{{ old('email') }}"
+                                    placeholder="nama@contoh.com">
+                            </div>
+
+
+                            <div class="field">
+                                <label for="password">
+                                    Password Awal <span class="required-mark">*</span>
+                                </label>
+
+                                <div class="password-wrapper">
+                                    <input id="password" name="password" type="password" minlength="8"
+                                        placeholder="Minimal 8 karakter"
+                                        class="{{ $errors->has('password') ? 'is-invalid' : '' }}" required>
+
+                                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility()"
+                                        aria-label="Tampilkan password" title="Tampilkan password">
+                                        <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                            stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" />
+                                            <circle cx="12" cy="12" r="3" />
+                                        </svg>
+                                    </button>
+                                </div>
+
+                                @error('password')
+                                    <div class="error-message">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+
+                            <div class="field">
+                                <label for="role">Role Pengguna</label>
+                                <select id="role" name="role" required>
+                                    <option value="staff" {{ old('role', 'staff') === 'staff' ? 'selected' : '' }}>
+                                        Staf
+                                    </option>
+                                    <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>
+                                        Admin
+                                    </option>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn-primary">
+                                Tambah Akun
+                            </button>
+                        </form>
                     </div>
-                </div>
-            </section>
+                </section>
+
+                <section class="card">
+                    <div class="card-header">
+                        <h2>Daftar Akun</h2>
+                        <p>Akun yang terdaftar pada sistem Generator PB.</p>
+                    </div>
+
+                    <div class="card-body">
+                        <div class="table-summary">
+                            <strong>Pengguna Terdaftar</strong>
+                            <span class="count">{{ $users->count() }} akun</span>
+                        </div>
+
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>No.</th>
+                                        <th>Nama</th>
+                                        <th>Username</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @forelse ($users as $user)
+                                        <tr>
+                                            <td>{{ $loop->iteration }}</td>
+                                            <td class="user-name">{{ $user->name }}</td>
+                                            <td>{{ $user->username }}</td>
+                                            <td>{{ $user->email ?: '-' }}</td>
+                                            <td>
+                                                <span class="role {{ $user->role === 'admin' ? 'role-admin' : 'role-staff' }}">
+                                                    {{ $user->role === 'admin' ? 'Admin' : 'Staf' }}
+                                                </span>
+                                            </td>
+
+
+                                            <td>
+                                                <div class="action-buttons">
+                                                    <a href="{{ route('admin.users.edit', $user) }}"
+                                                        class="icon-button edit-button" title="Edit akun"
+                                                        aria-label="Edit akun {{ $user->username }}">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+                                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round">
+                                                            <path d="M12 20h9" />
+                                                            <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z" />
+                                                        </svg>
+                                                    </a>
+
+                                                    @if ($user->id !== auth()->id())
+                                                        <form action="{{ route('admin.users.destroy', $user) }}" method="POST"
+                                                            onsubmit="return confirm('Yakin ingin menghapus akun {{ $user->username }}?');">
+                                                            @csrf
+                                                            @method('DELETE')
+
+                                                            <button type="submit" class="icon-button delete-button"
+                                                                title="Hapus akun" aria-label="Hapus akun {{ $user->username }}">
+                                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"
+                                                                    fill="none" stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" stroke-linejoin="round">
+                                                                    <path d="M3 6h18" />
+                                                                    <path d="M8 6V4h8v2" />
+                                                                    <path d="m19 6-1 14H6L5 6" />
+                                                                    <path d="M10 11v5M14 11v5" />
+                                                                </svg>
+                                                            </button>
+                                                        </form>
+                                                    @endif
+                                                </div>
+                                            </td>
+
+                                        </tr>
+                                    @empty
+                                        <tr>
+                                            <td colspan="6" class="empty">
+                                                Belum ada akun terdaftar.
+                                            </td>
+                                        </tr>
+                                    @endforelse
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <footer class="page-footer">
+                Generator PB &middot; Divisi E-Channel &middot; Bank Riau Kepri Syariah
+            </footer>
         </div>
 
-        <footer class="page-footer">
-            Generator PB &middot; Divisi E-Channel &middot; Bank Riau Kepri Syariah
-        </footer>
-    </main>
-</body>
-</html>
+        <script>
+            function togglePasswordVisibility() {
+                const passwordInput = document.getElementById('password');
+
+                if (!passwordInput) return;
+
+                passwordInput.type =
+                    passwordInput.type === 'password' ? 'text' : 'password';
+            }
+        </script>
+@endsection

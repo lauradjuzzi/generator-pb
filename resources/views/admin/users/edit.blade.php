@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -16,7 +17,9 @@
             --danger: #A63D40;
         }
 
-        * { box-sizing: border-box; }
+        * {
+            box-sizing: border-box;
+        }
 
         body {
             margin: 0;
@@ -46,7 +49,10 @@
             letter-spacing: 1.5px;
         }
 
-        h1 { margin: 0; font-size: 26px; }
+        h1 {
+            margin: 0;
+            font-size: 26px;
+        }
 
         .subtitle {
             margin: 9px 0 24px;
@@ -54,7 +60,9 @@
             line-height: 1.6;
         }
 
-        .field { margin-bottom: 18px; }
+        .field {
+            margin-bottom: 18px;
+        }
 
         label {
             display: block;
@@ -62,7 +70,8 @@
             font-weight: 600;
         }
 
-        input, select {
+        input,
+        select {
             width: 100%;
             min-height: 42px;
             padding: 10px 12px;
@@ -73,7 +82,8 @@
             font: inherit;
         }
 
-        input:focus, select:focus {
+        input:focus,
+        select:focus {
             outline: 2px solid #B8D9CA;
             border-color: var(--teal);
         }
@@ -119,7 +129,9 @@
             color: var(--white);
         }
 
-        .primary:hover { background: var(--teal-dark); }
+        .primary:hover {
+            background: var(--teal-dark);
+        }
 
         .secondary {
             border-color: var(--border);
@@ -128,12 +140,55 @@
         }
 
         @media (max-width: 480px) {
-            .card { padding: 20px; }
-            .actions { flex-direction: column; }
-            .button { width: 100%; }
+            .card {
+                padding: 20px;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+
+            .button {
+                width: 100%;
+            }
+        }
+
+
+        .password-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .password-wrapper input {
+            width: 100%;
+            padding-right: 45px;
+        }
+
+        .password-wrapper .toggle-password {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 4px;
+            margin: 0;
+            border: none;
+            background: transparent;
+            color: #6B7773;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .password-wrapper .toggle-password:hover {
+            color: #286963;
         }
     </style>
 </head>
+
 <body>
     <main class="card">
         <div class="eyebrow">SISTEM INTERNAL</div>
@@ -159,33 +214,28 @@
 
             <div class="field">
                 <label for="name">Nama Lengkap</label>
-                <input id="name" name="name" type="text"
-                    value="{{ old('name', $user->name) }}" required>
+                <input id="name" name="name" type="text" value="{{ old('name', $user->name) }}" required>
             </div>
 
             <div class="field">
                 <label for="username">Username</label>
-                <input id="username" name="username" type="text"
-                    value="{{ old('username', $user->username) }}"
+                <input id="username" name="username" type="text" value="{{ old('username', $user->username) }}"
                     pattern="[A-Za-z0-9_-]+" required>
                 <div class="hint">Username harus unik.</div>
             </div>
 
             <div class="field">
                 <label for="email">Email (opsional)</label>
-                <input id="email" name="email" type="email"
-                    value="{{ old('email', $user->email) }}">
+                <input id="email" name="email" type="email" value="{{ old('email', $user->email) }}">
             </div>
 
             <div class="field">
                 <label for="role">Role Pengguna</label>
                 <select id="role" name="role" required>
-                    <option value="staff"
-                        {{ old('role', $user->role) === 'staff' ? 'selected' : '' }}>
+                    <option value="staff" {{ old('role', $user->role) === 'staff' ? 'selected' : '' }}>
                         Staf
                     </option>
-                    <option value="admin"
-                        {{ old('role', $user->role) === 'admin' ? 'selected' : '' }}>
+                    <option value="admin" {{ old('role', $user->role) === 'admin' ? 'selected' : '' }}>
                         Admin
                     </option>
                 </select>
@@ -196,20 +246,59 @@
                 @endif
             </div>
 
-            <div class="hint">
-                Password tidak berubah saat data akun diedit.
+
+            <div class="field">
+                <label for="password">Password Baru (opsional)</label>
+
+                <div class="password-wrapper">
+                    <input id="password" name="password" type="password" minlength="8"
+                        placeholder="Kosongkan jika tidak ingin mengubah" autocomplete="new-password"
+                        class="{{ $errors->has('password') ? 'is-invalid' : '' }}">
+
+                    <button type="button" class="toggle-password" onclick="togglePasswordVisibility()"
+                        aria-label="Tampilkan password" title="Tampilkan password">
+                        <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"
+                            fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round">
+                            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" />
+                            <circle cx="12" cy="12" r="3" />
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="hint">
+                    Isi hanya jika ingin mengganti password. Minimal 8 karakter.
+                </div>
+
+                @error('password')
+                    <div class="error-message">{{ $message }}</div>
+                @enderror
             </div>
+
 
             <div class="actions">
                 <button type="submit" class="button primary">
                     Simpan Perubahan
                 </button>
-                <a href="{{ route('admin.users.index') }}"
-                    class="button secondary">
+                <a href="{{ route('admin.users.index') }}" class="button secondary">
                     Batal
                 </a>
             </div>
         </form>
     </main>
+
+
+    <script>
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+
+            if (!passwordInput) return;
+
+            passwordInput.type =
+                passwordInput.type === 'password' ? 'text' : 'password';
+        }
+    </script>
+
 </body>
+
 </html>
