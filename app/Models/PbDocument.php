@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+
 class PbDocument extends Model
 {
     protected $fillable = [
@@ -16,6 +17,11 @@ class PbDocument extends Model
         'leader_position_snapshot',
         'signature_date',
         'created_by',
+        'signatory_type',
+        'first_signatory_position',
+        'first_signatory_name',
+        'second_signatory_position',
+        'second_signatory_name',
     ];
 
     protected function casts(): array

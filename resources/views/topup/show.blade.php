@@ -5,7 +5,7 @@
 
 @section('content')
     <a href="{{ route('dashboard') }}"
-       style="display:inline-flex; align-items:center; gap:8px; margin-bottom:20px; font-weight:600;">
+        style="display:inline-flex; align-items:center; gap:8px; margin-bottom:20px; font-weight:600;">
         ← Kembali ke Dashboard
     </a>
 
@@ -17,9 +17,10 @@
     </p>
 
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px;">
-        <a href="#"
-           class="card card-hover"
-           style="display:block; padding:24px; color:inherit;">
+        <a href="{{ route('topup.generator.create', [
+        'topupType' => $topupType->slug,
+        'documentType' => 'pb01',
+    ]) }}" class="card card-hover" style="display:block; padding:24px; color:inherit;">
             <div style="font-size:12px; font-weight:700; color:#286963; margin-bottom:12px;">
                 DOKUMEN PB 01
             </div>
@@ -37,9 +38,10 @@
             </span>
         </a>
 
-        <a href="#"
-           class="card card-hover"
-           style="display:block; padding:24px; color:inherit;">
+        <a href="{{ route('topup.generator.create', [
+        'topupType' => $topupType->slug,
+        'documentType' => 'pb02',
+    ]) }}" class="card card-hover" style="display:block; padding:24px; color:inherit;">
             <div style="font-size:12px; font-weight:700; color:#286963; margin-bottom:12px;">
                 DOKUMEN PB 02
             </div>

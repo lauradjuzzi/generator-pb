@@ -204,6 +204,13 @@
                     class="app-nav-item {{ request()->routeIs('admin.users.index', 'admin.users.store') ? 'active' : '' }}">
                     Kelola Pengguna
                 </a>
+
+
+                <a href="{{ route('admin.leaders.index') }}"
+                    class="app-nav-item {{ request()->routeIs('admin.leaders.*') ? 'active' : '' }}">
+                    Kelola Pimpinan
+                </a>
+
             @endif
 
         </aside>
