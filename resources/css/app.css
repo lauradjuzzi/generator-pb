@@ -9,3 +9,43 @@
     --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
         'Segoe UI Symbol', 'Noto Color Emoji';
 }
+
+/* Perbaikan tampilan header kalender Flatpickr */
+.flatpickr-calendar {
+    width: 310px !important;
+}
+
+.flatpickr-months {
+    height: 48px !important;
+    align-items: center;
+}
+
+.flatpickr-current-month {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 75% !important;
+    left: 12.5% !important;
+    padding: 0 !important;
+}
+
+.flatpickr-current-month .flatpickr-monthDropdown-months {
+    width: auto !important;
+    min-width: 115px;
+    max-width: 130px;
+    font-size: 16px !important;
+}
+
+.flatpickr-current-month input.cur-year {
+    width: 55px !important;
+    min-width: 55px !important;
+    padding: 0 !important;
+    font-size: 16px !important;
+    text-align: center;
+}
+
+.flatpickr-prev-month,
+.flatpickr-next-month {
+    top: 10px !important;
+}

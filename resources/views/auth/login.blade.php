@@ -415,23 +415,15 @@
             <div class="brand-icon" aria-hidden="true">PB</div>
             <div>
                 <p class="brand-name">Generator PB</p>
-                <p class="brand-caption">E-Channel Dashboard</p>
             </div>
         </div>
 
         <div class="brand-heading">
             <span class="eyebrow">SISTEM INTERNAL</span>
             <h1>Generator Pemindah Pembukuan (PB) </h1>
-            <p>
-                Divisi E-Channel<br>
-                Bank Riau Kepri Syariah
-            </p>
         </div>
     </div>
 
-    <div class="brand-footer">
-        Generator PB &middot; Divisi E-Channel
-    </div>
 </section>
 
 
@@ -440,9 +432,9 @@
             <h2>Selamat datang</h2>
 
             <div class="info-banner">
-                <span class="info-icon" aria-hidden="true">i</span>
+                <span class="info-icon" aria-hidden="true"></span>
                 <span>
-                    Gunakan username dan password untuk melanjutkan ke dashboard.
+                    Masukkan username dan password untuk melanjutkan ke dashboard.
                 </span>
             </div>
 
@@ -490,14 +482,9 @@
                 </div>
 
                 <button type="submit" class="login-button">
-                    <span aria-hidden="true">→</span>
-                    Login ke Dashboard
+                    Login
                 </button>
             </form>
-
-            <div class="form-footer">
-                Generator PB &middot; Versi 1.0
-            </div>
         </section>
     </main>
 </body>

@@ -334,6 +334,77 @@
                         @enderror
                     </div>
 
+                    <div class="field full">
+                        <label>Default Debet</label>
+                    </div>
+
+                    <div class="field">
+                        <label for="default_debit_account_number">Nomor Rekening Debet</label>
+                        <input id="default_debit_account_number" name="default_debit_account_number" type="text"
+                            maxlength="16" value="{{ old('default_debit_account_number') }}"
+                            placeholder="Nomor rekening debet">
+
+                        @error('default_debit_account_number')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="field">
+                        <label for="default_debit_account_name">Nama Rekening Debet</label>
+                        <input id="default_debit_account_name" name="default_debit_account_name" type="text" maxlength="150"
+                            value="{{ old('default_debit_account_name') }}" placeholder="Nama rekening debet">
+
+                        @error('default_debit_account_name')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="field full">
+                        <label for="default_debit_description">Keterangan Debet</label>
+                        <textarea id="default_debit_description" name="default_debit_description"
+                            placeholder="Keterangan default untuk transaksi debet">{{ old('default_debit_description') }}</textarea>
+
+                        @error('default_debit_description')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="field full">
+                        <label>Default Kredit</label>
+                    </div>
+
+                    <div class="field">
+                        <label for="default_credit_account_number">Nomor Rekening Kredit</label>
+                        <input id="default_credit_account_number" name="default_credit_account_number" type="text"
+                            maxlength="16" value="{{ old('default_credit_account_number') }}"
+                            placeholder="Nomor rekening kredit">
+
+                        @error('default_credit_account_number')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="field">
+                        <label for="default_credit_account_name">Nama Rekening Kredit</label>
+                        <input id="default_credit_account_name" name="default_credit_account_name" type="text"
+                            maxlength="150" value="{{ old('default_credit_account_name') }}"
+                            placeholder="Nama rekening kredit">
+
+                        @error('default_credit_account_name')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="field full">
+                        <label for="default_credit_description">Keterangan Kredit</label>
+                        <textarea id="default_credit_description" name="default_credit_description"
+                            placeholder="Keterangan default untuk transaksi kredit">{{ old('default_credit_description') }}</textarea>
+
+                        @error('default_credit_description')
+                            <span class="error-message">{{ $message }}</span>
+                        @enderror
+                    </div>
+
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary">
                             + Tambah Jenis Top Up
@@ -387,10 +458,16 @@
                                 <td>
                                     <div class="actions">
                                         <button type="button" class="btn btn-light" onclick="openEditModal(
-                                                        {{ $topupType->id }},
-                                                        {{ Js::from($topupType->name) }},
-                                                        {{ Js::from($topupType->description ?? '') }}
-                                                    )">
+                                                                            {{ $topupType->id }},
+                                                                            {{ Js::from($topupType->name) }},
+                                                                            {{ Js::from($topupType->description ?? '') }},
+                                                                            {{ Js::from($topupType->default_debit_account_number ?? '') }},
+                                                                            {{ Js::from($topupType->default_debit_account_name ?? '') }},
+                                                                            {{ Js::from($topupType->default_debit_description ?? '') }},
+                                                                            {{ Js::from($topupType->default_credit_account_number ?? '') }},
+                                                                            {{ Js::from($topupType->default_credit_account_name ?? '') }},
+                                                                            {{ Js::from($topupType->default_credit_description ?? '') }}
+                                                                        )">
                                             Edit
                                         </button>
 
@@ -423,22 +500,22 @@
 
     <!-- Modal Edit -->
     <div id="editModal" style="
-        display:none;
-        position:fixed;
-        inset:0;
-        z-index:1000;
-        background:rgba(20,35,32,.45);
-        padding:20px;
-        overflow-y:auto;
-    ">
+                        display:none;
+                        position:fixed;
+                        inset:0;
+                        z-index:1000;
+                        background:rgba(20,35,32,.45);
+                        padding:20px;
+                        overflow-y:auto;
+                    ">
         <div style="
-            max-width:500px;
-            margin:7vh auto;
-            padding:24px;
-            border-radius:14px;
-            background:white;
-            box-shadow:0 15px 40px rgba(0,0,0,.15);
-        ">
+                            max-width:500px;
+                            margin:7vh auto;
+                            padding:24px;
+                            border-radius:14px;
+                            background:white;
+                            box-shadow:0 15px 40px rgba(0,0,0,.15);
+                        ">
             <h2 style="margin-top:0;font-size:19px;">Edit Jenis Top Up</h2>
 
             <form id="editForm" method="POST">
@@ -452,9 +529,51 @@
                     <input id="edit_name" name="name" type="text" maxlength="100" required>
                 </div>
 
-                <div class="field" style="margin-bottom:22px;">
+                <div class="field" style="margin-bottom:17px;">
                     <label for="edit_description">Deskripsi (opsional)</label>
                     <textarea id="edit_description" name="description"></textarea>
+                </div>
+
+                <div style="margin-bottom:12px;">
+                    <strong style="font-size:14px;">Default Debet</strong>
+                </div>
+
+                <div class="field" style="margin-bottom:17px;">
+                    <label for="edit_default_debit_account_number">Nomor Rekening Debet</label>
+                    <input id="edit_default_debit_account_number" name="default_debit_account_number" type="text"
+                        maxlength="16">
+                </div>
+
+                <div class="field" style="margin-bottom:17px;">
+                    <label for="edit_default_debit_account_name">Nama Rekening Debet</label>
+                    <input id="edit_default_debit_account_name" name="default_debit_account_name" type="text"
+                        maxlength="150">
+                </div>
+
+                <div class="field" style="margin-bottom:17px;">
+                    <label for="edit_default_debit_description">Keterangan Debet</label>
+                    <textarea id="edit_default_debit_description" name="default_debit_description"></textarea>
+                </div>
+
+                <div style="margin:4px 0 12px;">
+                    <strong style="font-size:14px;">Default Kredit</strong>
+                </div>
+
+                <div class="field" style="margin-bottom:17px;">
+                    <label for="edit_default_credit_account_number">Nomor Rekening Kredit</label>
+                    <input id="edit_default_credit_account_number" name="default_credit_account_number" type="text"
+                        maxlength="16">
+                </div>
+
+                <div class="field" style="margin-bottom:17px;">
+                    <label for="edit_default_credit_account_name">Nama Rekening Kredit</label>
+                    <input id="edit_default_credit_account_name" name="default_credit_account_name" type="text"
+                        maxlength="150">
+                </div>
+
+                <div class="field" style="margin-bottom:22px;">
+                    <label for="edit_default_credit_description">Keterangan Kredit</label>
+                    <textarea id="edit_default_credit_description" name="default_credit_description"></textarea>
                 </div>
 
                 <div class="actions">
@@ -466,13 +585,32 @@
     </div>
 
     <script>
-        function openEditModal(id, name, description) {
+        function openEditModal(
+            id,
+            name,
+            description,
+            debitAccountNumber,
+            debitAccountName,
+            debitDescription,
+            creditAccountNumber,
+            creditAccountName,
+            creditDescription
+        ) {
             const modal = document.getElementById('editModal');
             const form = document.getElementById('editForm');
 
             form.action = `/topup-types/${id}`;
+
             document.getElementById('edit_name').value = name;
             document.getElementById('edit_description').value = description;
+
+            document.getElementById('edit_default_debit_account_number').value = debitAccountNumber;
+            document.getElementById('edit_default_debit_account_name').value = debitAccountName;
+            document.getElementById('edit_default_debit_description').value = debitDescription;
+
+            document.getElementById('edit_default_credit_account_number').value = creditAccountNumber;
+            document.getElementById('edit_default_credit_account_name').value = creditAccountName;
+            document.getElementById('edit_default_credit_description').value = creditDescription;
 
             modal.style.display = 'block';
             document.body.style.overflow = 'hidden';

@@ -21,6 +21,14 @@ class TopupTypeController extends Controller
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:100', 'unique:topup_types,name'],
             'description' => ['nullable', 'string'],
+
+            'default_debit_account_number' => ['nullable', 'string', 'max:16'],
+            'default_debit_account_name' => ['nullable', 'string', 'max:150'],
+            'default_debit_description' => ['nullable', 'string'],
+
+            'default_credit_account_number' => ['nullable', 'string', 'max:16'],
+            'default_credit_account_name' => ['nullable', 'string', 'max:150'],
+            'default_credit_description' => ['nullable', 'string'],
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
@@ -52,6 +60,14 @@ class TopupTypeController extends Controller
                 Rule::unique('topup_types', 'name')->ignore($topupType->id),
             ],
             'description' => ['nullable', 'string'],
+
+            'default_debit_account_number' => ['nullable', 'string', 'max:16'],
+            'default_debit_account_name' => ['nullable', 'string', 'max:150'],
+            'default_debit_description' => ['nullable', 'string'],
+
+            'default_credit_account_number' => ['nullable', 'string', 'max:16'],
+            'default_credit_account_name' => ['nullable', 'string', 'max:150'],
+            'default_credit_description' => ['nullable', 'string'],
         ]);
 
         $validated['slug'] = Str::slug($validated['name']);
@@ -61,8 +77,8 @@ class TopupTypeController extends Controller
 
         while (
             TopupType::where('slug', $validated['slug'])
-                ->where('id', '!=', $topupType->id)
-                ->exists()
+            ->where('id', '!=', $topupType->id)
+            ->exists()
         ) {
             $validated['slug'] = $baseSlug . '-' . $counter++;
         }
