@@ -22,12 +22,14 @@ class PbDocument extends Model
         'first_signatory_name',
         'second_signatory_position',
         'second_signatory_name',
+        'generated_at',
     ];
 
     protected function casts(): array
     {
         return [
             'signature_date' => 'date',
+            'generated_at' => 'datetime',
         ];
     }
 

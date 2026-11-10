@@ -47,8 +47,6 @@ class PbExcelGenerator
             throw new \RuntimeException('Data section PB tidak ditemukan.');
         }
 
-        $this->fillSignature($spreadsheet, $document);
-
         $sheetName = match ($section->section_type) {
             'pb01' => 'PB_ATMB',
             'pb02' => 'PB_ATMB (2)',
@@ -56,6 +54,12 @@ class PbExcelGenerator
         };
 
         $sheet = $spreadsheet->getSheetByName($sheetName);
+
+        if (! $sheet) {
+            throw new \RuntimeException(
+                'Sheet Excel "' . $sheetName . '" tidak ditemukan.'
+            );
+        }
 
         $entries = $section->entries->keyBy('entry_type');
 
@@ -65,20 +69,23 @@ class PbExcelGenerator
         if (! $debit || ! $credit) {
             throw new \RuntimeException('Data Debet atau Kredit tidak lengkap.');
         }
-        // Terbilang berdasarkan nominal transaksi.
-        $sheetNames = ['PB_ATMB', 'PB_ATMB (2)'];
 
-        foreach ($sheetNames as $name) {
-            $currentSheet = $spreadsheet->getSheetByName($name);
+        // Tanda tangan hanya untuk sheet PB yang sedang diproses.
+        $this->fillSignature($spreadsheet, $document, $sheetName);
 
-            $currentSheet->setCellValue(
-                'C30',
-                $this->terbilang((float) $debit->amount)
-            );
-        }
+        // Nomor PB hanya untuk sheet PB yang sedang diproses.
+        $year = $document->signature_date->year;
 
-        // Nomor PB
-        $sheet->setCellValue('H10', $document->document_number);
+        $sheet->setCellValue(
+            'B5',
+            'No : ' . $document->document_number . ' /OPS.PBK/' . $year
+        );
+
+        // Terbilang hanya berdasarkan nominal dokumen ini.
+        $sheet->setCellValue(
+            'C30',
+            $this->terbilang((float) $debit->amount)
+        );
 
         // Data Debet
         $sheet->setCellValue('B10', $debit->account_number);
@@ -89,11 +96,6 @@ class PbExcelGenerator
         $sheet->setCellValue('D10', $credit->account_number);
         $sheet->setCellValue('D11', $credit->account_name);
         $sheet->setCellValue('E11', (float) $credit->amount);
-
-        // PB 02 menggunakan nominal langsung dari database
-        if ($section->section_type === 'pb02') {
-            $sheet->setCellValue('C11', (float) $debit->amount);
-        }
 
         // Periode transaksi
         $period = $this->formatPeriod($debit);
@@ -108,7 +110,6 @@ class PbExcelGenerator
             trim($credit->description ?? '') . ' periode ' . $period
         );
     }
-
     private function formatPeriod($entry): string
     {
         $start = $entry->date_from->translatedFormat('d F Y');
@@ -125,120 +126,139 @@ class PbExcelGenerator
 
     private function fillSignature(
         Spreadsheet $spreadsheet,
-        PbDocument $document
+        PbDocument $document,
+        string $sheetName
     ): void {
-        $sheetNames = [
-            'PB_ATMB',
-            'PB_ATMB (2)',
+        $sheet = $spreadsheet->getSheetByName($sheetName);
+
+        if (! $sheet) {
+            throw new \RuntimeException(
+                'Sheet Excel "' . $sheetName . '" tidak ditemukan.'
+            );
+        }
+
+        // Buka baris yang digunakan untuk area tanda tangan.
+        foreach ([36, 38, 39, 40, 41, 42, 43] as $row) {
+            $sheet->getRowDimension($row)->setVisible(true);
+        }
+
+        // Bersihkan sel bantu nomor PB.
+        $sheet->setCellValue('H10', null);
+        $sheet->setCellValue('H11', null);
+
+        // Perluas area cetak sampai baris tanda tangan.
+        $sheet->getPageSetup()->setPrintArea('B2:E43');
+
+        // Lepaskan merge lama.
+        $mergeRanges = [
+            'D33:E33',
+            'D34:E34',
+            'D36:E36',
+            'D38:E38',
+            'D39:E39',
+            'D41:E41',
+            'D42:E42',
+            'D43:E43',
         ];
 
-        foreach ($sheetNames as $sheetName) {
-            $sheet = $spreadsheet->getSheetByName($sheetName);
-
-            // Samakan area cetak kedua sheet.
-            $sheet->getPageSetup()->setPrintArea('B2:E39');
-
-            // Lepaskan merge lama agar susunan tanda tangan konsisten.
-            $mergeRanges = [
-                'D33:E33',
-                'D34:E34',
-                'D36:E36',
-                'D38:E38',
-                'D39:E39',
-                'D41:E41',
-                'D42:E42',
-            ];
-
-            foreach ($mergeRanges as $range) {
-                if (isset($sheet->getMergeCells()[$range])) {
-                    $sheet->unmergeCells($range);
-                }
+        foreach ($mergeRanges as $range) {
+            if (isset($sheet->getMergeCells()[$range])) {
+                $sheet->unmergeCells($range);
             }
+        }
 
-            // Hapus teks lama dan placeholder dari template.
-            foreach (
-                [
-                    'D36',
-                    'E36',
-                    'D38',
-                    'E38',
-                    'D39',
-                    'E39',
-                    'D41',
-                    'E41',
-                    'D42',
-                    'E42',
-                ] as $cell
-            ) {
-                $sheet->setCellValue($cell, null);
-            }
+        // Bersihkan area tanda tangan.
+        foreach (
+            [
+                'D36',
+                'E36',
+                'D38',
+                'E38',
+                'D39',
+                'E39',
+                'D41',
+                'E41',
+                'D42',
+                'E42',
+                'D43',
+                'E43',
+            ] as $cell
+        ) {
+            $sheet->setCellValue($cell, null);
+        }
 
-            // Tanggal dan nama divisi.
-            $date = $document->signature_date
-                ->locale('id')
-                ->translatedFormat('d F Y');
+        // Tanggal dan nama divisi.
+        $date = $document->signature_date
+            ->locale('id')
+            ->translatedFormat('d F Y');
 
-            $sheet->mergeCells('D33:E33');
-            $sheet->mergeCells('D34:E34');
+        $sheet->mergeCells('D33:E33');
+        $sheet->mergeCells('D34:E34');
 
-            $sheet->setCellValue('D33', 'Pekanbaru, ' . $date);
+        $sheet->setCellValue(
+            'D33',
+            'Pekanbaru, ' . $date
+        );
+
+        $sheet->setCellValue(
+            'D34',
+            'DIVISI OPERASIONAL & AKUNTANSI'
+        );
+
+        if ($document->signatory_type === 'pimpinan') {
+            // Satu pimpinan.
+            $sheet->mergeCells('D42:E42');
+            $sheet->mergeCells('D43:E43');
+
             $sheet->setCellValue(
-                'D34',
-                'DIVISI OPERASIONAL & AKUNTANSI'
+                'D42',
+                $document->first_signatory_name
             );
 
-            if ($document->signatory_type === 'pimpinan') {
-                // Satu pimpinan, posisinya tepat di tengah.
-                $sheet->mergeCells('D38:E38');
-                $sheet->mergeCells('D39:E39');
+            $sheet->setCellValue(
+                'D43',
+                $document->first_signatory_position
+            );
+        } elseif ($document->signatory_type === 'pimpinan_bagian') {
+            // Dua pimpinan bagian.
+            $sheet->mergeCells('D36:E36');
 
-                $sheet->setCellValue(
-                    'D38',
-                    $document->first_signatory_name
-                );
+            $sheet->setCellValue(
+                'D36',
+                'MENGETAHUI'
+            );
 
-                $sheet->setCellValue(
-                    'D39',
-                    $document->first_signatory_position
-                );
-            } elseif ($document->signatory_type === 'pimpinan_bagian') {
-                // Dua pimpinan bagian.
-                $sheet->mergeCells('D36:E36');
+            $sheet->setCellValue(
+                'D42',
+                $document->first_signatory_name
+            );
 
-                $sheet->setCellValue('D36', 'MENGETAHUI');
+            $sheet->setCellValue(
+                'E42',
+                $document->second_signatory_name
+            );
 
-                $sheet->setCellValue(
-                    'D38',
-                    $document->first_signatory_name
-                );
+            $sheet->setCellValue(
+                'D43',
+                $document->first_signatory_position
+            );
 
-                $sheet->setCellValue(
-                    'E38',
-                    $document->second_signatory_name
-                );
-
-                $sheet->setCellValue(
-                    'D39',
-                    $document->first_signatory_position
-                );
-
-                $sheet->setCellValue(
-                    'E39',
-                    $document->second_signatory_position
-                );
-            } else {
-                throw new \RuntimeException(
-                    'Tipe penanda tangan tidak valid.'
-                );
-            }
-
-            // Ratakan seluruh area tanda tangan.
-            $sheet->getStyle('D33:E39')
-                ->getAlignment()
-                ->setHorizontal(Alignment::HORIZONTAL_CENTER)
-                ->setVertical(Alignment::VERTICAL_CENTER)
-                ->setWrapText(true);
+            $sheet->setCellValue(
+                'E43',
+                $document->second_signatory_position
+            );
+        } else {
+            throw new \RuntimeException(
+                'Tipe penanda tangan tidak valid.'
+            );
         }
+
+        // Ratakan area tanda tangan.
+        $sheet->getStyle('D33:E43')
+            ->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER)
+            ->setVertical(Alignment::VERTICAL_CENTER)
+            ->setWrapText(true);
     }
 
     private function terbilang(float $angka): string

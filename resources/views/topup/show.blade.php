@@ -17,7 +17,7 @@
     </p>
 
     <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px;">
-        <a href="{{ route('topup.generator.create', [
+        <a href="{{ route('topup.generator', [
         'topupType' => $topupType->slug,
         'documentType' => 'pb01',
     ]) }}" class="card card-hover" style="display:block; padding:24px; color:inherit;">
@@ -38,7 +38,7 @@
             </span>
         </a>
 
-        <a href="{{ route('topup.generator.create', [
+        <a href="{{ route('topup.generator', [
         'topupType' => $topupType->slug,
         'documentType' => 'pb02',
     ]) }}" class="card card-hover" style="display:block; padding:24px; color:inherit;">
@@ -60,9 +60,14 @@
         </a>
     </div>
 
-    <div class="notice" style="margin-top:24px;">
-        <strong>Informasi:</strong>
-        Halaman formulir dan pembuatan Excel akan dihubungkan pada tahap berikutnya.
-        Saat ini, kedua pilihan dokumen masih berupa tampilan awal.
-    </div>
+    @if ($pb01 || $pb02)
+        <div style="margin-top:24px; display:flex; justify-content:flex-end;">
+            <a href="{{ route('topup.generator.excel', [
+                'topupType' => $topupType->slug,
+            ]) }}"
+                style="display:inline-block; padding:12px 20px; border-radius:9px; color:#fff; background:#286963; font-weight:700; text-decoration:none;">
+                Generate Excel
+            </a>
+        </div>
+    @endif
 @endsection

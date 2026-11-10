@@ -21,10 +21,17 @@ class PbDocumentController extends Controller
         return view('topup.show', compact('topupType'));
     }
 
-    public function create(TopupType $topupType, string $documentType)
-    {
+    public function create(
+        TopupType $topupType,
+        string $documentType
+    ) {
         abort_unless($topupType->is_active, 404);
-        abort_unless(in_array($documentType, ['pb01', 'pb02']), 404);
+
+        abort_unless(
+            in_array($documentType, ['pb01', 'pb02']),
+            404
+        );
+
         $pimpinanAktif = Leader::where('signatory_type', 'pimpinan')
             ->where('is_active', true)
             ->first();
@@ -41,13 +48,26 @@ class PbDocumentController extends Controller
         ));
     }
 
-    public function store(
+    public function storePb01(
+        Request $request,
+        TopupType $topupType
+    ) {
+        return $this->storePb($request, $topupType, 'pb01');
+    }
+
+    public function storePb02(
+        Request $request,
+        TopupType $topupType
+    ) {
+        return $this->storePb($request, $topupType, 'pb02');
+    }
+
+    private function storePb(
         Request $request,
         TopupType $topupType,
         string $documentType
     ) {
         abort_unless($topupType->is_active, 404);
-        abort_unless(in_array($documentType, ['pb01', 'pb02']), 404);
 
         $validated = $request->validate([
             'pb_number' => ['required', 'string', 'max:100'],
@@ -91,7 +111,7 @@ class PbDocumentController extends Controller
 
         $user = $request->user();
 
-        $document = DB::transaction(function () use (
+        DB::transaction(function () use (
             $validated,
             $topupType,
             $documentType,
@@ -135,7 +155,6 @@ class PbDocumentController extends Controller
                 'section_type' => $documentType,
             ]);
 
-            // Simpan data Debet
             PbEntry::create([
                 'pb_section_id' => $section->id,
                 'entry_type' => 'debet',
@@ -147,7 +166,6 @@ class PbDocumentController extends Controller
                 'amount' => $validated['debit_amount'],
             ]);
 
-            // Simpan data Kredit
             PbEntry::create([
                 'pb_section_id' => $section->id,
                 'entry_type' => 'kredit',
@@ -158,37 +176,86 @@ class PbDocumentController extends Controller
                 'description' => $validated['credit_description'] ?? null,
                 'amount' => $validated['credit_amount'],
             ]);
-
-            return $document;
         });
 
-        // Ambil kembali dokumen beserta seluruh relasinya.
-        $document->load('sections.entries');
+        return redirect()
+            ->route('topup.show', [
+                'topupType' => $topupType->slug,
+            ])
+            ->with(
+                'success',
+                strtoupper($documentType) . ' berhasil disimpan.'
+            );
+    }
 
-        // Muat template dan isi data PB.
-        $generator = app(PbExcelGenerator::class);
+    public function generateExcel(
+        Request $request,
+        TopupType $topupType
+    ) {
+        abort_unless($topupType->is_active, 404);
+
+        $user = $request->user();
+
+        $pb01 = PbDocument::where('topup_type_id', $topupType->id)
+            ->where('created_by', $user->id)
+            ->whereNull('generated_at')
+            ->whereHas('sections', function ($query) {
+                $query->where('section_type', 'pb01');
+            })
+            ->latest()
+            ->first();
+
+        $pb02 = PbDocument::where('topup_type_id', $topupType->id)
+            ->where('created_by', $user->id)
+            ->whereNull('generated_at')
+            ->whereHas('sections', function ($query) {
+                $query->where('section_type', 'pb02');
+            })
+            ->latest()
+            ->first();
+
+        if (!$pb01 && !$pb02) {
+            abort(404);
+        }
+
+        $generator = new PbExcelGenerator();
 
         $spreadsheet = $generator->loadTemplate();
 
-        $generator->fillDocument($spreadsheet, $document);
+        if ($pb01) {
+            $generator->fillDocument($spreadsheet, $pb01);
+        }
 
-        // Buat file Excel.
+        if ($pb02) {
+            $generator->fillDocument($spreadsheet, $pb02);
+        }
+
+        $filename = 'PB-' . $topupType->slug . '-' . now()->format('YmdHis') . '.xlsx';
+
         $writer = new Xlsx($spreadsheet);
 
-        // Nama file berdasarkan nomor PB.
-        $safeNumber = preg_replace(
-            '/[^A-Za-z0-9._-]/',
-            '_',
-            $document->document_number
+        $generatedAt = now();
+
+        if ($pb01) {
+            $pb01->update([
+                'generated_at' => $generatedAt,
+            ]);
+        }
+
+        if ($pb02) {
+            $pb02->update([
+                'generated_at' => $generatedAt,
+            ]);
+        }
+
+        return response()->streamDownload(
+            function () use ($writer) {
+                $writer->save('php://output');
+            },
+            $filename,
+            [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ]
         );
-
-        $fileName = 'PB-' . strtoupper($documentType) . '-' . $safeNumber . '.xlsx';
-
-        // Unduh file Excel.
-        return response()->streamDownload(function () use ($writer) {
-            $writer->save('php://output');
-        }, $fileName, [
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        ]);
     }
 }

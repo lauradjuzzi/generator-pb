@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\UserController;
@@ -37,25 +38,56 @@ Route::middleware('auth')->group(function () {
         ->name('topup-types.toggle-status');
 
 
-    Route::get('/topup/{topupType:slug}', function (\App\Models\TopupType $topupType) {
+    Route::get('/topup/{topupType:slug}', function (
+        Request $request,
+        \App\Models\TopupType $topupType
+    ) {
         abort_unless($topupType->is_active, 404);
-        return view('topup.show', compact('topupType'));
+
+        $pb01 = \App\Models\PbDocument::where('topup_type_id', $topupType->id)
+            ->where('created_by', $request->user()->id)
+            ->whereNull('generated_at')
+            ->whereHas('sections', function ($query) {
+                $query->where('section_type', 'pb01');
+            })
+            ->latest()
+            ->first();
+
+        $pb02 = \App\Models\PbDocument::where('topup_type_id', $topupType->id)
+            ->where('created_by', $request->user()->id)
+            ->whereNull('generated_at')
+            ->whereHas('sections', function ($query) {
+                $query->where('section_type', 'pb02');
+            })
+            ->latest()
+            ->first();
+
+        return view('topup.show', compact(
+            'topupType',
+            'pb01',
+            'pb02'
+        ));
     })->name('topup.show');
 
-    Route::get('/topup/{topupType:slug}/generator', [PbDocumentController::class, 'showGenerator'])
-        ->name('topup.generator');
+    Route::get('/topup/{topupType:slug}/generator/excel', [
+        PbDocumentController::class,
+        'generateExcel',
+    ])->name('topup.generator.excel');
 
     Route::get('/topup/{topupType:slug}/generator/{documentType}', [
         PbDocumentController::class,
         'create',
-    ])->whereIn('documentType', ['pb01', 'pb02'])
-        ->name('topup.generator.create');
+    ])->name('topup.generator');
 
-    Route::post(
-        '/topup/{topupType:slug}/generator/{documentType}',
-        [PbDocumentController::class, 'store']
-    )->whereIn('documentType', ['pb01', 'pb02'])
-        ->name('topup.generator.store');
+    Route::post('/topup/{topupType:slug}/generator/pb01', [
+        PbDocumentController::class,
+        'storePb01',
+    ])->name('topup.generator.pb01.store');
+
+    Route::post('/topup/{topupType:slug}/generator/pb02', [
+        PbDocumentController::class,
+        'storePb02',
+    ])->name('topup.generator.pb02.store');
 });
 
 Route::middleware(['auth', 'admin'])
