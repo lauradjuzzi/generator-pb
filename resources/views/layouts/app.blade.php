@@ -189,30 +189,24 @@
                 </a>
             @endforeach
 
-            <a href="#" class="app-nav-item {{ request()->routeIs('history.*') ? 'active' : '' }}">
-                Riwayat PB
+
+            <div class="app-nav-label">Administrasi</div>
+
+            <a href="{{ route('topup-types.index') }}"
+                class="app-nav-item {{ request()->routeIs('topup-types.*') ? 'active' : '' }}">
+                Kelola Jenis Top Up
             </a>
 
+            <a href="{{ route('leaders.index') }}"
+                class="app-nav-item {{ request()->routeIs('leaders.*') ? 'active' : '' }}">
+                Kelola Pimpinan
+            </a>
 
             @if (auth()->user()->role === 'admin')
-                <div class="app-nav-label">Administrasi</div>
-
-                <a href="{{ route('topup-types.index') }}"
-                    class="app-nav-item {{ request()->routeIs('topup-types.*') ? 'active' : '' }}">
-                    Kelola Jenis Top Up
-                </a>
-
                 <a href="{{ route('admin.users.index') }}"
-                    class="app-nav-item {{ request()->routeIs('admin.users.index', 'admin.users.store') ? 'active' : '' }}">
+                    class="app-nav-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
                     Kelola Pengguna
                 </a>
-
-
-                <a href="{{ route('admin.leaders.index') }}"
-                    class="app-nav-item {{ request()->routeIs('admin.leaders.*') ? 'active' : '' }}">
-                    Kelola Pimpinan
-                </a>
-
             @endif
 
         </aside>
@@ -239,7 +233,7 @@
 
             <section class="app-content">
                 @if (session('success'))
-                    <div class="alert alert-success">
+                    <div id="success-alert" class="alert alert-success">
                         {{ session('success') }}
                     </div>
                 @endif

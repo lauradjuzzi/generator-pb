@@ -135,6 +135,16 @@ class PbDocumentController extends Controller
                 $leaderId = $pimpinan->id;
             }
 
+            PbDocument::where('topup_type_id', $topupType->id)
+                ->where('created_by', $user->id)
+                ->where('is_active', true)
+                ->whereHas('sections', function ($query) use ($documentType) {
+                    $query->where('section_type', $documentType);
+                })
+                ->update([
+                    'is_active' => false,
+                ]);
+
             $document = PbDocument::create([
                 'document_number' => $validated['pb_number'],
                 'topup_type_id' => $topupType->id,
@@ -148,6 +158,7 @@ class PbDocumentController extends Controller
                 'first_signatory_name' => $firstName,
                 'second_signatory_position' => $secondPosition,
                 'second_signatory_name' => $secondName,
+                'is_active' => true,
             ]);
 
             $section = PbSection::create([
@@ -188,6 +199,53 @@ class PbDocumentController extends Controller
             );
     }
 
+    public function preview(
+        Request $request,
+        TopupType $topupType
+    ) {
+        abort_unless($topupType->is_active, 404);
+
+        $user = $request->user();
+
+        $pb01 = PbDocument::where('topup_type_id', $topupType->id)
+            ->where('created_by', $user->id)
+            ->where('is_active', true)
+            ->whereNull('generated_at')
+            ->whereHas('sections', function ($query) {
+                $query->where('section_type', 'pb01');
+            })
+            ->with('sections.entries')
+            ->latest()
+            ->first();
+
+        $pb02 = PbDocument::where('topup_type_id', $topupType->id)
+            ->where('created_by', $user->id)
+            ->where('is_active', true)
+            ->whereNull('generated_at')
+            ->whereHas('sections', function ($query) {
+                $query->where('section_type', 'pb02');
+            })
+            ->with('sections.entries')
+            ->latest()
+            ->first();
+
+        if (!$pb01 && !$pb02) {
+            return redirect()
+                ->route('topup.show', [
+                    'topupType' => $topupType->slug,
+                ])
+                ->withErrors([
+                    'preview' => 'Belum ada dokumen PB yang siap untuk di-preview.',
+                ]);
+        }
+
+        return view('topup.preview', compact(
+            'topupType',
+            'pb01',
+            'pb02'
+        ));
+    }
+
     public function generateExcel(
         Request $request,
         TopupType $topupType
@@ -198,6 +256,7 @@ class PbDocumentController extends Controller
 
         $pb01 = PbDocument::where('topup_type_id', $topupType->id)
             ->where('created_by', $user->id)
+            ->where('is_active', true)
             ->whereNull('generated_at')
             ->whereHas('sections', function ($query) {
                 $query->where('section_type', 'pb01');
@@ -207,6 +266,7 @@ class PbDocumentController extends Controller
 
         $pb02 = PbDocument::where('topup_type_id', $topupType->id)
             ->where('created_by', $user->id)
+            ->where('is_active', true)
             ->whereNull('generated_at')
             ->whereHas('sections', function ($query) {
                 $query->where('section_type', 'pb02');
@@ -239,12 +299,14 @@ class PbDocumentController extends Controller
         if ($pb01) {
             $pb01->update([
                 'generated_at' => $generatedAt,
+                'is_active' => false,
             ]);
         }
 
         if ($pb02) {
             $pb02->update([
                 'generated_at' => $generatedAt,
+                'is_active' => false,
             ]);
         }
 

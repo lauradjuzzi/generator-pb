@@ -52,10 +52,9 @@ class LeaderController extends Controller
         Leader::create($validated);
 
         return redirect()
-            ->route('admin.leaders.index')
+            ->route('leaders.index')
             ->with('success', 'Data pimpinan berhasil ditambahkan.');
     }
-
 
     public function toggleStatus(Leader $leader)
     {
@@ -67,14 +66,34 @@ class LeaderController extends Controller
             $leader->update(['is_active' => true]);
 
             return redirect()
-                ->route('admin.leaders.index')
-                ->with('success', 'Pimpinan berhasil diaktifkan. Data aktif sebelumnya pada jenis yang sama telah dinonaktifkan.');
+                ->route('leaders.index')
+                ->with(
+                    'success',
+                    'Pimpinan berhasil diaktifkan. Data aktif sebelumnya pada jenis yang sama telah dinonaktifkan.'
+                );
         }
 
         $leader->update(['is_active' => false]);
 
         return redirect()
-            ->route('admin.leaders.index')
+            ->route('leaders.index')
             ->with('success', 'Pimpinan berhasil dinonaktifkan.');
+    }
+
+    public function destroy(Leader $leader)
+    {
+        if ($leader->is_active) {
+            return redirect()
+                ->route('leaders.index')
+                ->withErrors([
+                    'leader' => 'Pimpinan yang masih aktif tidak dapat dihapus. Nonaktifkan terlebih dahulu.',
+                ]);
+        }
+
+        $leader->delete();
+
+        return redirect()
+            ->route('leaders.index')
+            ->with('success', 'Data pimpinan berhasil dihapus.');
     }
 }

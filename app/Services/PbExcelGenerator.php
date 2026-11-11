@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use PhpOffice\PhpSpreadsheet\Style\Font;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use App\Models\PbDocument;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -118,6 +119,10 @@ class PbExcelGenerator
             return $start;
         }
 
+        if ($entry->date_from->isSameDay($entry->date_until)) {
+            return $start;
+        }
+
         $end = $entry->date_until->translatedFormat('d F Y');
 
         return $start . ' s.d. ' . $end;
@@ -138,7 +143,7 @@ class PbExcelGenerator
         }
 
         // Buka baris yang digunakan untuk area tanda tangan.
-        foreach ([36, 38, 39, 40, 41, 42, 43] as $row) {
+        foreach ([36, 38, 39, 40, 41] as $row) {
             $sheet->getRowDimension($row)->setVisible(true);
         }
 
@@ -151,11 +156,14 @@ class PbExcelGenerator
 
         // Lepaskan merge lama.
         $mergeRanges = [
+            'B40:C40',
+            'B41:C41',
             'D33:E33',
             'D34:E34',
             'D36:E36',
             'D38:E38',
             'D39:E39',
+            'D40:E40',
             'D41:E41',
             'D42:E42',
             'D43:E43',
@@ -176,6 +184,8 @@ class PbExcelGenerator
                 'E38',
                 'D39',
                 'E39',
+                'D40',
+                'E40',
                 'D41',
                 'E41',
                 'D42',
@@ -207,44 +217,36 @@ class PbExcelGenerator
 
         if ($document->signatory_type === 'pimpinan') {
             // Satu pimpinan.
-            $sheet->mergeCells('D42:E42');
-            $sheet->mergeCells('D43:E43');
+            $sheet->mergeCells('D40:E40');
+            $sheet->mergeCells('D41:E41');
 
             $sheet->setCellValue(
-                'D42',
+                'D40',
                 $document->first_signatory_name
             );
 
             $sheet->setCellValue(
-                'D43',
+                'D41',
                 $document->first_signatory_position
             );
         } elseif ($document->signatory_type === 'pimpinan_bagian') {
-            // Dua pimpinan bagian.
-            $sheet->mergeCells('D36:E36');
-
             $sheet->setCellValue(
-                'D36',
-                'MENGETAHUI'
-            );
-
-            $sheet->setCellValue(
-                'D42',
+                'D40',
                 $document->first_signatory_name
             );
 
             $sheet->setCellValue(
-                'E42',
+                'E40',
                 $document->second_signatory_name
             );
 
             $sheet->setCellValue(
-                'D43',
+                'D41',
                 $document->first_signatory_position
             );
 
             $sheet->setCellValue(
-                'E43',
+                'E41',
                 $document->second_signatory_position
             );
         } else {
@@ -253,15 +255,52 @@ class PbExcelGenerator
             );
         }
 
+        // Samakan font dasar area tanda tangan dengan template.
+        $signatureFont = clone $sheet->getStyle('D33')->getFont();
+
+        $sheet->getStyle('D33:E34')
+            ->setFont(clone $signatureFont);
+
+        $sheet->getStyle('D40:E41')
+            ->setFont(clone $signatureFont);
+
+        // Font area tanda tangan.
+        $sheet->getStyle('D40:E41')
+            ->getFont()
+            ->setName($signatureFont->getName())
+            ->setSize(12);
+
+        // Nama pimpinan: bold dan underline.
+        $sheet->getStyle('D40:E40')
+            ->getFont()
+            ->setBold(true)
+            ->setUnderline(Font::UNDERLINE_SINGLE);
+
+        // Jabatan: normal.
+        $sheet->getStyle('D41:E41')
+            ->getFont()
+            ->setBold(false)
+            ->setUnderline(Font::UNDERLINE_NONE);
+
         // Ratakan area tanda tangan.
         $sheet->getStyle('D33:E43')
             ->getAlignment()
-            ->setHorizontal(Alignment::HORIZONTAL_CENTER)
             ->setVertical(Alignment::VERTICAL_CENTER)
             ->setWrapText(true);
+
+        $sheet->getStyle('D33:E34')
+            ->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        $sheet->getRowDimension(40)->setRowHeight(-1);
+        $sheet->getRowDimension(41)->setRowHeight(-1);
+
+        $sheet->getStyle('D40:E41')
+            ->getAlignment()
+            ->setHorizontal(Alignment::HORIZONTAL_CENTER);
     }
 
-    private function terbilang(float $angka): string
+    public function terbilang(float $angka): string
     {
         $angka = (int) round($angka);
 

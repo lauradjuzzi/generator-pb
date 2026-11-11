@@ -138,6 +138,49 @@
             background: #F1F2F0;
         }
 
+        .leader-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .leader-status-light {
+            width: 9px;
+            height: 9px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .leader-status-light.active {
+            background: #22C55E;
+            box-shadow: 0 0 0 3px #DCFCE7;
+        }
+
+        .leader-status-light.inactive {
+            background: #A0AAA6;
+            box-shadow: 0 0 0 3px #EEF0EF;
+        }
+
+        .leader-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .leader-delete-button {
+            padding: 11px 17px;
+            border: 0;
+            border-radius: 8px;
+            color: #B42318;
+            background: #FEECEB;
+            font-weight: 650;
+            cursor: pointer;
+        }
+
+        .leader-delete-button:hover {
+            background: #FDD8D5;
+        }
+
         .leader-error {
             color: #B42318;
             font-size: 12px;
@@ -199,7 +242,7 @@
         <div class="leader-card">
             <h2>Tambah Data Pimpinan</h2>
 
-            <form action="{{ route('admin.leaders.store') }}" method="POST">
+            <form action="{{ route('leaders.store') }}" method="POST">
                 @csrf
 
 
@@ -308,21 +351,42 @@
                                                 @endif
                                             </td>
                                             <td>
-                                                <span class="leader-badge {{ $leader->is_active ? 'active' : 'inactive' }}">
-                                                    {{ $leader->is_active ? 'Aktif' : 'Nonaktif' }}
+                                                <span class="leader-status">
+                                                    <span
+                                                        class="leader-status-light {{ $leader->is_active ? 'active' : 'inactive' }}"></span>
+
+                                                    <span class="leader-badge {{ $leader->is_active ? 'active' : 'inactive' }}">
+                                                        {{ $leader->is_active ? 'Aktif' : 'Nonaktif' }}
+                                                    </span>
                                                 </span>
                                             </td>
 
                                             <td>
-                                                <form action="{{ route('admin.leaders.toggle-status', $leader) }}" method="POST"
-                                                    onsubmit="return confirm('Yakin ingin mengubah status pimpinan ini?')">
-                                                    @csrf
-                                                    @method('PATCH')
+                                                <div class="leader-actions">
 
-                                                    <button type="submit" class="leader-button">
-                                                        {{ $leader->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
-                                                    </button>
-                                                </form>
+                                                    <form action="{{ route('leaders.toggle-status', $leader) }}" method="POST"
+                                                        onsubmit="return confirm('Yakin ingin mengubah status pimpinan ini?')">
+                                                        @csrf
+                                                        @method('PATCH')
+
+                                                        <button type="submit" class="leader-button">
+                                                            {{ $leader->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
+                                                        </button>
+                                                    </form>
+
+                                                    @if (!$leader->is_active)
+                                                        <form action="{{ route('leaders.destroy', $leader) }}" method="POST"
+                                                            onsubmit="return confirm('Yakin ingin menghapus data pimpinan ini? Data yang sudah tersimpan di dokumen PB tidak akan berubah.')">
+                                                            @csrf
+                                                            @method('DELETE')
+
+                                                            <button type="submit" class="leader-delete-button">
+                                                                Hapus
+                                                            </button>
+                                                        </form>
+                                                    @endif
+
+                                                </div>
                                             </td>
 
                                         </tr>

@@ -23,6 +23,7 @@ class PbDocument extends Model
         'second_signatory_position',
         'second_signatory_name',
         'generated_at',
+        'is_active',
     ];
 
     protected function casts(): array
@@ -30,6 +31,7 @@ class PbDocument extends Model
         return [
             'signature_date' => 'date',
             'generated_at' => 'datetime',
+            'is_active' => 'boolean',
         ];
     }
 

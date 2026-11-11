@@ -46,6 +46,7 @@ Route::middleware('auth')->group(function () {
 
         $pb01 = \App\Models\PbDocument::where('topup_type_id', $topupType->id)
             ->where('created_by', $request->user()->id)
+            ->where('is_active', true)
             ->whereNull('generated_at')
             ->whereHas('sections', function ($query) {
                 $query->where('section_type', 'pb01');
@@ -55,6 +56,7 @@ Route::middleware('auth')->group(function () {
 
         $pb02 = \App\Models\PbDocument::where('topup_type_id', $topupType->id)
             ->where('created_by', $request->user()->id)
+            ->where('is_active', true)
             ->whereNull('generated_at')
             ->whereHas('sections', function ($query) {
                 $query->where('section_type', 'pb02');
@@ -68,6 +70,16 @@ Route::middleware('auth')->group(function () {
             'pb02'
         ));
     })->name('topup.show');
+
+    Route::get('/topup/{topupType:slug}/generator/preview', [
+        PbDocumentController::class,
+        'preview',
+    ])->name('topup.generator.preview');
+
+    Route::get('/topup/{topupType:slug}/generator/excel', [
+        PbDocumentController::class,
+        'generateExcel',
+    ])->name('topup.generator.excel');
 
     Route::get('/topup/{topupType:slug}/generator/excel', [
         PbDocumentController::class,
@@ -88,6 +100,18 @@ Route::middleware('auth')->group(function () {
         PbDocumentController::class,
         'storePb02',
     ])->name('topup.generator.pb02.store');
+
+    Route::get('/leaders', [LeaderController::class, 'index'])
+        ->name('leaders.index');
+
+    Route::post('/leaders', [LeaderController::class, 'store'])
+        ->name('leaders.store');
+
+    Route::patch('/leaders/{leader}/toggle-status', [LeaderController::class, 'toggleStatus'])
+        ->name('leaders.toggle-status');
+        
+    Route::delete('/leaders/{leader}', [LeaderController::class, 'destroy'])
+        ->name('leaders.destroy');
 });
 
 Route::middleware(['auth', 'admin'])
@@ -108,15 +132,6 @@ Route::middleware(['auth', 'admin'])
 
         Route::put('/users/{user}', [UserController::class, 'update'])
             ->name('users.update');
-
-        Route::get('/leaders', [LeaderController::class, 'index'])
-            ->name('leaders.index');
-
-        Route::post('/leaders', [LeaderController::class, 'store'])
-            ->name('leaders.store');
-
-        Route::patch('/leaders/{leader}/toggle-status', [LeaderController::class, 'toggleStatus'])
-            ->name('leaders.toggle-status');
     });
 
 Route::redirect('/', '/dashboard');

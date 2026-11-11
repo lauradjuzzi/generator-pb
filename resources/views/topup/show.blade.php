@@ -62,11 +62,11 @@
 
     @if ($pb01 || $pb02)
         <div style="margin-top:24px; display:flex; justify-content:flex-end;">
-            <a href="{{ route('topup.generator.excel', [
+            <a href="{{ route('topup.generator.preview', [
                 'topupType' => $topupType->slug,
-            ]) }}"
+            ]) }}" onclick="document.getElementById('success-alert')?.remove()"
                 style="display:inline-block; padding:12px 20px; border-radius:9px; color:#fff; background:#286963; font-weight:700; text-decoration:none;">
-                Generate Excel
+                Preview
             </a>
         </div>
     @endif
