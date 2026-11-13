@@ -18,9 +18,25 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [
+        PbDocumentController::class,
+        'dashboard',
+    ])->name('dashboard');
+
+    Route::put('/documents/{document}', [
+        PbDocumentController::class,
+        'update',
+    ])->name('documents.update');
+
+    Route::get('/documents/{document}/download', [
+        PbDocumentController::class,
+        'download',
+    ])->name('documents.download');
+
+    Route::get('/documents/{document}/edit', [
+        PbDocumentController::class,
+        'edit',
+    ])->name('documents.edit');
 
     Route::post('/logout', [AuthController::class, 'logout'])
         ->name('logout');
@@ -109,7 +125,7 @@ Route::middleware('auth')->group(function () {
 
     Route::patch('/leaders/{leader}/toggle-status', [LeaderController::class, 'toggleStatus'])
         ->name('leaders.toggle-status');
-        
+
     Route::delete('/leaders/{leader}', [LeaderController::class, 'destroy'])
         ->name('leaders.destroy');
 });

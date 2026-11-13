@@ -1,13 +1,17 @@
-@vite(['resources/css/app.css', 'resources/js/app.js'])
-
 <!DOCTYPE html>
 <html lang="id">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+
     <title>@yield('title', 'Generator PB') - BRK Syariah</title>
+
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+
     @stack('styles')
 
     <style>
@@ -242,6 +246,7 @@
             </section>
         </main>
     </div>
+    @stack('scripts')
 </body>
 
 </html>

@@ -65,7 +65,8 @@
                                 Nomor PB
                             </label>
 
-                            <input type="text" id="pb01_number" name="pb_number" value="{{ old('pb_number') }}"
+                            <input type="text" id="pb01_number" name="pb_number" autocomplete="off"
+                                value="{{ old('pb_number') }}"
                                 class="w-full rounded-lg border-gray-300 focus:border-teal-600 focus:ring-teal-600"
                                 placeholder="Masukkan nomor PB" required>
                         </div>
@@ -256,7 +257,8 @@
                                 Nomor PB
                             </label>
 
-                            <input type="text" id="pb02_number" name="pb_number" value="{{ old('pb_number') }}"
+                            <input type="text" id="pb02_number" name="pb_number" autocomplete="off"
+                                value="{{ old('pb_number') }}"
                                 class="w-full rounded-lg border-gray-300 focus:border-teal-600 focus:ring-teal-600"
                                 placeholder="Masukkan nomor PB" required>
                         </div>

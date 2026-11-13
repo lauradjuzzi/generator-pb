@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class PbDocument extends Model
 {
     protected $fillable = [
+        'excel_group_id',
         'document_number',
         'topup_type_id',
         'leader_id',

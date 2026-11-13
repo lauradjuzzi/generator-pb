@@ -168,7 +168,9 @@
         }
 
         .signature-area {
+            width: 50%;
             margin-top: 20px;
+            margin-left: auto;
         }
 
         .signature-date {
@@ -475,10 +477,6 @@
                         </div>
 
                         @if ($document->signatory_type === 'pimpinan_bagian')
-
-                            <div class="signature-knowing">
-                                MENGETAHUI
-                            </div>
 
                             <div class="signature-two">
 
