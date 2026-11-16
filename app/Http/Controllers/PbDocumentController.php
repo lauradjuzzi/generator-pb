@@ -166,6 +166,9 @@ class PbDocumentController extends Controller
                 ->where('created_by', $user->id)
                 ->where('is_active', true)
                 ->whereNull('generated_at')
+                ->whereHas('sections', function ($query) use ($documentType) {
+                    $query->where('section_type', $documentType === 'pb01' ? 'pb02' : 'pb01');
+                })
                 ->first();
 
             $excelGroupId = $existingDocument?->excel_group_id
@@ -637,27 +640,32 @@ class PbDocumentController extends Controller
 
         $user = $request->user();
 
-        $pb01 = PbDocument::where('topup_type_id', $topupType->id)
+        $activeDocument = PbDocument::where('topup_type_id', $topupType->id)
             ->where('created_by', $user->id)
             ->where('is_active', true)
             ->whereNull('generated_at')
-            ->whereHas('sections', function ($query) {
-                $query->where('section_type', 'pb01');
-            })
             ->latest()
             ->first();
 
-        $pb02 = PbDocument::where('topup_type_id', $topupType->id)
+        if (!$activeDocument) {
+            abort(404);
+        }
+
+        $documents = PbDocument::where(
+            'excel_group_id',
+            $activeDocument->excel_group_id
+        )
+            ->where('topup_type_id', $topupType->id)
             ->where('created_by', $user->id)
             ->where('is_active', true)
             ->whereNull('generated_at')
-            ->whereHas('sections', function ($query) {
-                $query->where('section_type', 'pb02');
-            })
-            ->latest()
-            ->first();
+            ->with([
+                'sections.entries',
+            ])
+            ->orderBy('id')
+            ->get();
 
-        if (!$pb01 && !$pb02) {
+        if ($documents->isEmpty()) {
             abort(404);
         }
 
@@ -665,29 +673,26 @@ class PbDocumentController extends Controller
 
         $spreadsheet = $generator->loadTemplate();
 
-        if ($pb01) {
-            $generator->fillDocument($spreadsheet, $pb01);
+        foreach ($documents as $document) {
+            $generator->fillDocument(
+                $spreadsheet,
+                $document
+            );
         }
 
-        if ($pb02) {
-            $generator->fillDocument($spreadsheet, $pb02);
-        }
-
-        $filename = 'PB-' . $topupType->slug . '-' . now()->format('YmdHis') . '.xlsx';
+        $filename =
+            'PB-' .
+            $topupType->slug .
+            '-' .
+            now()->format('YmdHis') .
+            '.xlsx';
 
         $writer = new Xlsx($spreadsheet);
 
         $generatedAt = now();
 
-        if ($pb01) {
-            $pb01->update([
-                'generated_at' => $generatedAt,
-                'is_active' => false,
-            ]);
-        }
-
-        if ($pb02) {
-            $pb02->update([
+        foreach ($documents as $document) {
+            $document->update([
                 'generated_at' => $generatedAt,
                 'is_active' => false,
             ]);
@@ -699,7 +704,8 @@ class PbDocumentController extends Controller
             },
             $filename,
             [
-                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Type' =>
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             ]
         );
     }
@@ -711,33 +717,34 @@ class PbDocumentController extends Controller
             'sections.entries',
         ]);
 
-        $documents = collect([$document]);
+        $documents = PbDocument::where(
+            'excel_group_id',
+            $document->excel_group_id
+        )
+            ->with([
+                'topupType',
+                'sections.entries',
+            ])
+            ->orderBy('id')
+            ->get();
 
-        if ($document->generated_at) {
-            $relatedDocuments = PbDocument::where('id', '!=', $document->id)
-                ->where('topup_type_id', $document->topup_type_id)
-                ->where('created_by', $document->created_by)
-                ->where('generated_at', $document->generated_at)
-                ->with([
-                    'topupType',
-                    'sections.entries',
-                ])
-                ->get();
-
-            $documents = $documents->merge($relatedDocuments);
+        if ($documents->isEmpty()) {
+            abort(404);
         }
 
         $generator = new PbExcelGenerator();
         $spreadsheet = $generator->loadTemplate();
 
         foreach ($documents as $item) {
-            $generator->fillDocument($spreadsheet, $item);
+            $generator->fillDocument(
+                $spreadsheet,
+                $item
+            );
         }
 
-        $filename = 'PB-' .
-            $document->topupType->slug .
+        $filename = 'PB-' . $document->topupType->slug .
             '-' .
-            now()->format('YmdHis') .
+            now()->format('d-m-Y') .
             '.xlsx';
 
         $writer = new Xlsx($spreadsheet);
@@ -757,7 +764,8 @@ class PbDocumentController extends Controller
             },
             $filename,
             [
-                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Type' =>
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             ]
         );
     }
@@ -797,6 +805,38 @@ class PbDocumentController extends Controller
                                 'like',
                                 "%{$search}%"
                             );
+                        })
+                        ->orWhereHas('sections.entries', function ($query) use ($search) {
+                            $query->where(
+                                'account_number',
+                                'like',
+                                "%{$search}%"
+                            )
+                                ->orWhere(
+                                    'account_name',
+                                    'like',
+                                    "%{$search}%"
+                                )
+                                ->orWhere(
+                                    'description',
+                                    'like',
+                                    "%{$search}%"
+                                )
+                                ->orWhere(
+                                    'date_from',
+                                    'like',
+                                    "%{$search}%"
+                                )
+                                ->orWhere(
+                                    'date_until',
+                                    'like',
+                                    "%{$search}%"
+                                )
+                                ->orWhere(
+                                    'amount',
+                                    'like',
+                                    "%{$search}%"
+                                );
                         });
                 });
             })

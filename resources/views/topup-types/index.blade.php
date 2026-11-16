@@ -291,12 +291,6 @@
             </a>
         </header>
 
-        @if (session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
-
         @if ($errors->any())
             <div class="alert alert-error">
                 Ada data yang perlu diperbaiki. Periksa kembali form di bawah.
@@ -458,16 +452,16 @@
                                 <td>
                                     <div class="actions">
                                         <button type="button" class="btn btn-light" onclick="openEditModal(
-                                                                            {{ $topupType->id }},
-                                                                            {{ Js::from($topupType->name) }},
-                                                                            {{ Js::from($topupType->description ?? '') }},
-                                                                            {{ Js::from($topupType->default_debit_account_number ?? '') }},
-                                                                            {{ Js::from($topupType->default_debit_account_name ?? '') }},
-                                                                            {{ Js::from($topupType->default_debit_description ?? '') }},
-                                                                            {{ Js::from($topupType->default_credit_account_number ?? '') }},
-                                                                            {{ Js::from($topupType->default_credit_account_name ?? '') }},
-                                                                            {{ Js::from($topupType->default_credit_description ?? '') }}
-                                                                        )">
+                                                                                    {{ $topupType->id }},
+                                                                                    {{ Js::from($topupType->name) }},
+                                                                                    {{ Js::from($topupType->description ?? '') }},
+                                                                                    {{ Js::from($topupType->default_debit_account_number ?? '') }},
+                                                                                    {{ Js::from($topupType->default_debit_account_name ?? '') }},
+                                                                                    {{ Js::from($topupType->default_debit_description ?? '') }},
+                                                                                    {{ Js::from($topupType->default_credit_account_number ?? '') }},
+                                                                                    {{ Js::from($topupType->default_credit_account_name ?? '') }},
+                                                                                    {{ Js::from($topupType->default_credit_description ?? '') }}
+                                                                                )">
                                             Edit
                                         </button>
 
@@ -500,22 +494,22 @@
 
     <!-- Modal Edit -->
     <div id="editModal" style="
-                        display:none;
-                        position:fixed;
-                        inset:0;
-                        z-index:1000;
-                        background:rgba(20,35,32,.45);
-                        padding:20px;
-                        overflow-y:auto;
-                    ">
-        <div style="
-                            max-width:500px;
-                            margin:7vh auto;
-                            padding:24px;
-                            border-radius:14px;
-                            background:white;
-                            box-shadow:0 15px 40px rgba(0,0,0,.15);
+                            display:none;
+                            position:fixed;
+                            inset:0;
+                            z-index:1000;
+                            background:rgba(20,35,32,.45);
+                            padding:20px;
+                            overflow-y:auto;
                         ">
+        <div style="
+                                max-width:500px;
+                                margin:7vh auto;
+                                padding:24px;
+                                border-radius:14px;
+                                background:white;
+                                box-shadow:0 15px 40px rgba(0,0,0,.15);
+                            ">
             <h2 style="margin-top:0;font-size:19px;">Edit Jenis Top Up</h2>
 
             <form id="editForm" method="POST">

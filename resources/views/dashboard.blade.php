@@ -540,6 +540,18 @@
                 justify-content: space-between;
             }
         }
+
+        .input-error {
+            border-color: #dc3545 !important;
+            background-color: #fff5f5;
+        }
+
+        .edit-field-error {
+            display: none;
+            margin-top: 5px;
+            color: #dc3545;
+            font-size: 12px;
+        }
     </style>
 
     <div class="dashboard-header">
@@ -631,10 +643,34 @@
                                     @endphp
 
                                     <tr data-search="{{ strtolower(
-                                $document->document_number . ' ' .
+                                $document->group_documents
+                                    ->flatMap(function ($groupDocument) {
+                                        return $groupDocument->sections;
+                                    })
+                                    ->flatMap(function ($section) {
+                                        return $section->entries;
+                                    })
+                                    ->map(function ($entry) {
+                                        return implode(' ', [
+                                            $entry->amount,
+                                            number_format(
+                                                (float) $entry->amount,
+                                                0,
+                                                ',',
+                                                '.'
+                                            ),
+                                            $entry->date_from?->format('Y-m-d'),
+                                            $entry->date_until?->format('Y-m-d'),
+                                        ]);
+                                    })
+                                    ->implode(' ') . ' ' .
+                                $document->group_documents
+                                    ->pluck('document_number')
+                                    ->implode(' ') . ' ' .
                                 ($document->topupType?->name ?? '') . ' ' .
                                 $documentType . ' ' .
-                                ($document->creator?->name ?? '')
+                                ($document->creator?->name ?? '') . ' ' .
+                                ($document->signature_date?->format('Y-m-d') ?? '')
                             ) }}">
                                         <td>
                                             @php
@@ -854,7 +890,7 @@
 
                 <div class="edit-sections">
 
-                    <div class="edit-section">
+                    <div class="edit-section" id="edit-section-pb01">
 
                         <h3>Mendebet Rekening</h3>
 
@@ -882,7 +918,7 @@
 
                         <div class="edit-field">
                             <label>Nominal</label>
-                            <input type="number" id="edit-pb01-debit-amount" name="pb01_debit_amount" min="0.01" step="0.01"
+                            <input type="text" id="edit-pb01-debit-amount" name="pb01_debit_amount" min="0.01" step="0.01"
                                 inputmode="decimal" required>
 
                             <p id="edit-pb01-debit-amount-error" class="edit-input-error" style="display: none;">
@@ -915,8 +951,8 @@
 
                         <div class="edit-field">
                             <label>Nominal</label>
-                            <input type="number" id="edit-pb01-credit-amount" name="pb01_credit_amount" min="0.01"
-                                step="0.01" inputmode="decimal" required>
+                            <input type="text" id="edit-pb01-credit-amount" name="pb01_credit_amount" min="0.01" step="0.01"
+                                inputmode="decimal" required>
 
                             <p id="edit-pb01-credit-amount-error" class="edit-input-error" style="display: none;">
                                 Nominal harus berupa angka dan lebih dari 0.
@@ -931,7 +967,7 @@
                     </div>
 
 
-                    <div class="edit-section">
+                    <div class="edit-section" id="edit-section-pb02">
 
                         <h3>Penerusan BI</h3>
                         <div class="edit-field">
@@ -958,7 +994,7 @@
 
                         <div class="edit-field">
                             <label>Nominal</label>
-                            <input type="number" id="edit-pb02-debit-amount" name="pb02_debit_amount" min="0.01" step="0.01"
+                            <input type="text" id="edit-pb02-debit-amount" name="pb02_debit_amount" min="0.01" step="0.01"
                                 inputmode="decimal" required>
 
                             <p id="edit-pb02-debit-amount-error" class="edit-input-error" style="display: none;">
@@ -991,8 +1027,8 @@
 
                         <div class="edit-field">
                             <label>Nominal</label>
-                            <input type="number" id="edit-pb02-credit-amount" name="pb02_credit_amount" min="0.01"
-                                step="0.01" inputmode="decimal" required>
+                            <input type="text" id="edit-pb02-credit-amount" name="pb02_credit_amount" min="0.01" step="0.01"
+                                inputmode="decimal" required>
 
                             <p id="edit-pb02-credit-amount-error" class="edit-input-error" style="display: none;">
                                 Nominal harus berupa angka dan lebih dari 0.
@@ -1050,6 +1086,31 @@
                     const pb02 = documents.find(
                         document => document.section_type === 'pb02'
                     );
+
+                    const pb01Section = document.getElementById(
+                        'edit-section-pb01'
+                    );
+
+                    const pb02Section = document.getElementById(
+                        'edit-section-pb02'
+                    );
+
+                    function setSectionState(section, enabled) {
+                        if (!section) {
+                            return;
+                        }
+
+                        section.style.display = enabled ? '' : 'none';
+
+                        section
+                            .querySelectorAll('input, select, textarea')
+                            .forEach(function (input) {
+                                input.disabled = !enabled;
+                            });
+                    }
+
+                    setSectionState(pb01Section, !!pb01);
+                    setSectionState(pb02Section, !!pb02);
 
                     if (pb01) {
                         document.getElementById(
@@ -1213,18 +1274,34 @@
                 const accountInputs = [
                     {
                         input: document.getElementById(
-                            'edit-debit-account-number'
+                            'edit-pb01-debit-account-number'
                         ),
                         error: document.getElementById(
-                            'edit-debit-account-number-error'
+                            'edit-pb01-debit-account-number-error'
                         ),
                     },
                     {
                         input: document.getElementById(
-                            'edit-credit-account-number'
+                            'edit-pb01-credit-account-number'
                         ),
                         error: document.getElementById(
-                            'edit-credit-account-number-error'
+                            'edit-pb01-credit-account-number-error'
+                        ),
+                    },
+                    {
+                        input: document.getElementById(
+                            'edit-pb02-debit-account-number'
+                        ),
+                        error: document.getElementById(
+                            'edit-pb02-debit-account-number-error'
+                        ),
+                    },
+                    {
+                        input: document.getElementById(
+                            'edit-pb02-credit-account-number'
+                        ),
+                        error: document.getElementById(
+                            'edit-pb02-credit-account-number-error'
                         ),
                     },
                 ];
@@ -1235,18 +1312,23 @@
                     }
 
                     input.addEventListener('input', function () {
-                        const originalValue = input.value;
+                        const value = input.value.trim();
 
-                        const numericValue =
-                            originalValue.replace(/[^0-9]/g, '');
+                        if (value === '') {
+                            input.classList.remove('input-error');
+                            error.textContent = '';
+                            error.style.display = 'none';
+                            return;
+                        }
 
-                        if (originalValue !== numericValue) {
-                            input.value = numericValue;
-
-                            input.classList.add('edit-input-invalid');
+                        if (!/^[0-9]+$/.test(value)) {
+                            input.classList.add('input-error');
+                            error.textContent =
+                                'Nomor rekening hanya boleh berisi angka.';
                             error.style.display = 'block';
                         } else {
-                            input.classList.remove('edit-input-invalid');
+                            input.classList.remove('input-error');
+                            error.textContent = '';
                             error.style.display = 'none';
                         }
                     });
@@ -1254,12 +1336,36 @@
 
                 const amountInputs = [
                     {
-                        input: document.getElementById('edit-debit-amount'),
-                        error: document.getElementById('edit-debit-amount-error'),
+                        input: document.getElementById(
+                            'edit-pb01-debit-amount'
+                        ),
+                        error: document.getElementById(
+                            'edit-pb01-debit-amount-error'
+                        ),
                     },
                     {
-                        input: document.getElementById('edit-credit-amount'),
-                        error: document.getElementById('edit-credit-amount-error'),
+                        input: document.getElementById(
+                            'edit-pb01-credit-amount'
+                        ),
+                        error: document.getElementById(
+                            'edit-pb01-credit-amount-error'
+                        ),
+                    },
+                    {
+                        input: document.getElementById(
+                            'edit-pb02-debit-amount'
+                        ),
+                        error: document.getElementById(
+                            'edit-pb02-debit-amount-error'
+                        ),
+                    },
+                    {
+                        input: document.getElementById(
+                            'edit-pb02-credit-amount'
+                        ),
+                        error: document.getElementById(
+                            'edit-pb02-credit-amount-error'
+                        ),
                     },
                 ];
 
@@ -1269,19 +1375,23 @@
                     }
 
                     input.addEventListener('input', function () {
-                        const value = input.value;
+                        const value = input.value.trim();
 
-                        const amount = Number(value);
+                        if (value === '') {
+                            input.classList.remove('input-error');
+                            error.textContent = '';
+                            error.style.display = 'none';
+                            return;
+                        }
 
-                        if (
-                            value === '' ||
-                            !Number.isFinite(amount) ||
-                            amount <= 0
-                        ) {
-                            input.classList.add('edit-input-invalid');
+                        if (!/^[0-9]+(\.[0-9]+)?$/.test(value)) {
+                            input.classList.add('input-error');
+                            error.textContent =
+                                'Nominal hanya boleh berisi angka.';
                             error.style.display = 'block';
                         } else {
-                            input.classList.remove('edit-input-invalid');
+                            input.classList.remove('input-error');
+                            error.textContent = '';
                             error.style.display = 'none';
                         }
                     });
