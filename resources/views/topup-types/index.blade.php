@@ -278,19 +278,6 @@
 
     <div class="container">
 
-        <header class="page-header">
-            <div>
-                <h1>Kelola Jenis Top Up</h1>
-                <p class="subtitle">
-                    Tambahkan dan atur jenis top up yang tersedia untuk seluruh pengguna.
-                </p>
-            </div>
-
-            <a href="{{ route('dashboard') }}" class="back-link">
-                &larr; Kembali ke Dashboard
-            </a>
-        </header>
-
         @if ($errors->any())
             <div class="alert alert-error">
                 Ada data yang perlu diperbaiki. Periksa kembali form di bawah.

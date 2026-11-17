@@ -97,18 +97,24 @@ class PbExcelGenerator
         $sheet->setCellValue('D10', $credit->account_number);
         $sheet->setCellValue('D11', $credit->account_name);
         $sheet->setCellValue('E11', (float) $credit->amount);
-
         // Periode transaksi
         $period = $this->formatPeriod($debit);
 
+        $isDateRange = $debit->date_until
+            && ! $debit->date_from->isSameDay($debit->date_until);
+
+        $periodText = $isDateRange
+            ? ' periode ' . $period
+            : ' ' . $period;
+
         $sheet->setCellValue(
             'B15',
-            trim($debit->description ?? '') . ' periode ' . $period
+            trim($debit->description ?? '') . $periodText
         );
 
         $sheet->setCellValue(
             'D15',
-            trim($credit->description ?? '') . ' periode ' . $period
+            trim($credit->description ?? '') . $periodText
         );
     }
     private function formatPeriod($entry): string
@@ -302,17 +308,41 @@ class PbExcelGenerator
 
     public function terbilang(float $angka): string
     {
-        $angka = (int) round($angka);
+        $angka = round($angka, 2);
 
-        if ($angka === 0) {
+        $angka = number_format(
+            abs($angka),
+            2,
+            '.',
+            ''
+        );
+
+        [$rupiah, $desimal] = explode('.', $angka);
+
+        $rupiah = (int) $rupiah;
+        $desimal = (int) $desimal;
+
+        if ($rupiah === 0 && $desimal === 0) {
             return 'Nol rupiah';
         }
 
-        if ($angka < 0) {
-            return 'Minus ' . $this->konversiAngka(abs($angka)) . ' rupiah';
+        $hasil = '';
+
+        if ($rupiah > 0) {
+            $hasil = $this->konversiAngka($rupiah);
         }
 
-        return ucfirst($this->konversiAngka($angka)) . ' rupiah';
+        if ($desimal > 0) {
+            $hasil .= ' ' . $this->konversiAngka($desimal);
+        }
+
+        $hasil = trim($hasil);
+
+        if ($angka < 0) {
+            $hasil = 'minus ' . $hasil;
+        }
+
+        return ucfirst($hasil) . ' rupiah';
     }
 
     private function konversiAngka(int $angka): string

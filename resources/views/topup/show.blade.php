@@ -4,70 +4,123 @@
 @section('page-label', 'Transaksi PB / Top Up ' . $topupType->name)
 
 @section('content')
-    <a href="{{ route('dashboard') }}"
-        style="display:inline-flex; align-items:center; gap:8px; margin-bottom:20px; font-weight:600;">
-        ← Kembali ke Dashboard
-    </a>
+    <div class="brk-page-head brk-animate-in">
 
-    <h1>Top Up {{ $topupType->name }}</h1>
+        <div class="brk-page-heading">
+            <div>
+                <span class="brk-page-eyebrow">
+                    TRANSAKSI PB
+                </span>
 
-    <p class="intro">
-        Pilih jenis dokumen pemindahbukuan yang ingin disiapkan
-        untuk kebutuhan administrasi {{ $topupType->name }}.
-    </p>
+                <h1>
+                    Top Up {{ $topupType->name }}
+                </h1>
 
-    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:20px;">
+                <p>
+                    Pilih jenis dokumen pemindahbukuan yang ingin
+                    disiapkan untuk kebutuhan administrasi
+                    {{ $topupType->name }}.
+                </p>
+            </div>
+
+            <div class="brk-page-accent" aria-hidden="true">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="brk-pb-choice-grid">
+
         <a href="{{ route('topup.generator', [
         'topupType' => $topupType->slug,
         'documentType' => 'pb01',
-    ]) }}" class="card card-hover" style="display:block; padding:24px; color:inherit;">
-            <div style="font-size:12px; font-weight:700; color:#286963; margin-bottom:12px;">
-                DOKUMEN PB 01
+    ]) }}" class="brk-pb-choice brk-pb-choice-red brk-animate-in brk-animate-delay-1">
+
+            <div class="brk-pb-choice-top">
+                <span class="brk-pb-number">
+                    DOKUMEN PB 01
+                </span>
             </div>
 
-            <h2 style="font-size:20px; margin-bottom:10px;">
-                Mendebet Rekening
-            </h2>
+            <div class="brk-pb-choice-body">
+                <span class="brk-pb-label">
+                    JENIS TRANSAKSI
+                </span>
 
-            <p style="margin-bottom:18px;">
-                Siapkan dokumen PB untuk proses pendebetan rekening.
-            </p>
+                <h2>
+                    Mendebet Rekening
+                </h2>
+            </div>
 
-            <span style="font-weight:700; color:#286963;">
-                Pilih menu →
-            </span>
+            <div class="brk-pb-choice-footer">
+                <span>
+                    Buka formulir PB 01
+                </span>
+
+                <span class="brk-pb-arrow" aria-hidden="true">
+                    →
+                </span>
+            </div>
         </a>
 
         <a href="{{ route('topup.generator', [
         'topupType' => $topupType->slug,
         'documentType' => 'pb02',
-    ]) }}" class="card card-hover" style="display:block; padding:24px; color:inherit;">
-            <div style="font-size:12px; font-weight:700; color:#286963; margin-bottom:12px;">
-                DOKUMEN PB 02
+    ]) }}" class="brk-pb-choice brk-pb-choice-green brk-animate-in brk-animate-delay-2">
+
+            <div class="brk-pb-choice-top">
+                <span class="brk-pb-number">
+                    DOKUMEN PB 02
+                </span>
             </div>
 
-            <h2 style="font-size:20px; margin-bottom:10px;">
-                Penerusan ke BI
-            </h2>
+            <div class="brk-pb-choice-body">
+                <span class="brk-pb-label">
+                    JENIS TRANSAKSI
+                </span>
 
-            <p style="margin-bottom:18px;">
-                Siapkan dokumen PB untuk proses penerusan ke BI.
-            </p>
+                <h2>
+                    Penerusan ke BI
+                </h2>
+            </div>
 
-            <span style="font-weight:700; color:#286963;">
-                Pilih menu →
-            </span>
+            <div class="brk-pb-choice-footer">
+                <span>
+                    Buka formulir PB 02
+                </span>
+
+                <span class="brk-pb-arrow" aria-hidden="true">
+                    →
+                </span>
+            </div>
         </a>
+
     </div>
 
     @if ($pb01 || $pb02)
-        <div style="margin-top:24px; display:flex; justify-content:flex-end;">
+        <div class="brk-preview-bar brk-animate-in brk-animate-delay-3">
+
+            <div class="brk-preview-info">
+                <div class="brk-preview-status">
+                    <span class="brk-status-pulse"></span>
+                    <span>Dokumen siap di-preview</span>
+                </div>
+
+                <span>
+                    Periksa data PB sebelum mengunduh dokumen Excel.
+                </span>
+            </div>
+
             <a href="{{ route('topup.generator.preview', [
                 'topupType' => $topupType->slug,
-            ]) }}" onclick="document.getElementById('success-alert')?.remove()"
-                style="display:inline-block; padding:12px 20px; border-radius:9px; color:#fff; background:#286963; font-weight:700; text-decoration:none;">
-                Preview
+            ]) }}" onclick="document.getElementById('success-alert')?.remove()" class="brk-preview-button">
+
+                <span>Preview Dokumen</span>
+                <span aria-hidden="true">→</span>
             </a>
+
         </div>
     @endif
 @endsection

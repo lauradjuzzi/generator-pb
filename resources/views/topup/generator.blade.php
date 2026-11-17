@@ -1,37 +1,63 @@
 @extends('layouts.app')
 
 @section('content')
-    <div class="max-w-5xl mx-auto px-6 py-8">
+    <div class="brk-form-page">
 
-        <div class="mb-6">
-            <a href="{{ route('topup.show', $topupType->slug) }}" class="text-sm text-teal-700 hover:underline">
-                &larr; Kembali
-            </a>
+        <div class="brk-form-header brk-form-animate">
 
-            <h1 class="mt-3 text-2xl font-bold text-gray-800">
-                Formulir {{ strtoupper($documentType) }}
-            </h1>
+            <div class="brk-form-heading">
 
-            <p class="mt-1 text-gray-600">
-                Jenis Top Up: {{ $topupType->name }}
-            </p>
+                <div>
+                    <span class="brk-form-eyebrow">
+                        {{ strtoupper($documentType) }}
+                    </span>
+
+                    <h1>
+                        {{ $documentType === 'pb01' ? 'Mendebet Rekening' : 'Penerusan ke BI' }}
+                    </h1>
+
+                    <p>
+                        Top Up {{ $topupType->name }}
+                    </p>
+                </div>
+
+            </div>
+
         </div>
+
 
         {{-- PESAN BERHASIL --}}
         @if (session('success'))
-            <div class="mb-6 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-                {{ session('success') }}
+            <div class="brk-form-alert brk-form-alert-success brk-form-animate">
+
+                <div class="brk-form-alert-icon">
+                    ✓
+                </div>
+
+                <div>
+                    {{ session('success') }}
+                </div>
+
             </div>
         @endif
 
+
         {{-- PESAN ERROR --}}
         @if ($errors->any())
-            <div class="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                <ul class="list-disc space-y-1 pl-5">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+            <div class="brk-form-alert brk-form-alert-error brk-form-animate">
+
+                <div class="brk-form-alert-icon">
+                    !
+                </div>
+
+                <div>
+                    <ul>
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+
             </div>
         @endif
 
@@ -39,17 +65,33 @@
         {{-- ==================== PB 01 ==================== --}}
         @if ($documentType === 'pb01')
 
-            <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+            <div class="brk-pb-form-card brk-form-animate brk-form-delay-1">
 
-                <div class="mb-6 border-b border-gray-200 pb-3">
-                    <h2 class="text-xl font-bold text-gray-800">
-                        PB 01
-                    </h2>
+                <div class="brk-pb-form-card-header">
 
-                    <p class="mt-1 text-sm text-gray-500">
-                        Mendebet Rekening
-                    </p>
+                    <div class="brk-pb-form-card-title">
+
+                        <div class="brk-pb-form-badge">
+                            PB 01
+                        </div>
+
+                        <div>
+                            <h2>Mendebet Rekening</h2>
+
+                            <p>
+                                Formulir transaksi pemindahbukuan untuk pendebetan rekening.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <div class="brk-form-status">
+                        <span class="brk-form-status-dot"></span>
+                        <span>Data transaksi</span>
+                    </div>
+
                 </div>
+
 
                 <form method="POST" action="{{ route('topup.generator.pb01.store', [
                 'topupType' => $topupType->slug,
@@ -59,189 +101,233 @@
 
                     <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
 
-                        {{-- NOMOR PB --}}
+                        {{-- INFORMASI PB --}}
                         <div>
-                            <label for="pb01_number" class="mb-1 block text-sm font-medium text-gray-700">
+                            <label for="pb01_number">
                                 Nomor PB
                             </label>
 
                             <input type="text" id="pb01_number" name="pb_number" autocomplete="off"
-                                value="{{ old('pb_number') }}"
-                                class="w-full rounded-lg border-gray-300 focus:border-teal-600 focus:ring-teal-600"
-                                placeholder="Masukkan nomor PB" required>
+                                value="{{ old('pb_number') }}" placeholder="Masukkan nomor PB" required>
                         </div>
+
 
                         {{-- PERIODE --}}
                         <div class="form-group">
-                            <label for="pb01_date_range">Tanggal</label>
+
+                            <label for="pb01_date_range">
+                                Periode Transaksi
+                            </label>
 
                             <input type="text" id="pb01_date_range" placeholder="Pilih rentang tanggal" autocomplete="off"
                                 class="form-control">
 
                             <input type="hidden" name="date_from" id="pb01_date_from">
                             <input type="hidden" name="date_until" id="pb01_date_until">
+
                         </div>
 
 
                         {{-- DEBET --}}
                         <div class="mt-4 md:col-span-2">
-                            <div class="border-b border-gray-200 pb-2">
-                                <h3 class="text-lg font-semibold text-gray-800">
-                                    Debet
-                                </h3>
 
-                                <p class="text-sm text-gray-500">
+                            <div>
+                                <h3>Debet</h3>
+
+                                <p>
                                     Data rekening yang akan didebet.
                                 </p>
                             </div>
+
                         </div>
 
+
+                        {{-- NOMOR REKENING DEBET --}}
                         <div>
-                            <label for="pb01_debit_account_number" class="mb-1 block text-sm font-medium text-gray-700">
+
+                            <label for="pb01_debit_account_number">
                                 Nomor Rekening Debet
                             </label>
 
                             <input type="text" id="pb01_debit_account_number" name="debit_account_number"
                                 value="{{ old('debit_account_number', $topupType->default_debit_account_number) }}"
-                                maxlength="16" inputmode="numeric" pattern="[0-9]*"
-                                class="pb01-number w-full rounded-lg border-gray-300 focus:border-teal-600 focus:ring-teal-600"
-                                placeholder="Nomor rekening debet" required>
+                                maxlength="16" inputmode="numeric" pattern="[0-9]*" class="pb01-number"
+                                placeholder="Masukkan nomor rekening" required>
 
-                            <p id="pb01_debit_account_number_error" class="mt-1 hidden text-xs text-red-600">
+                            <p id="pb01_debit_account_number_error" class="hidden">
                                 Nomor rekening hanya boleh berisi angka.
                             </p>
+
                         </div>
 
+
+                        {{-- NAMA REKENING DEBET --}}
                         <div>
-                            <label for="pb01_debit_account_name" class="mb-1 block text-sm font-medium text-gray-700">
+
+                            <label for="pb01_debit_account_name">
                                 Nama Rekening Debet
                             </label>
 
                             <input type="text" id="pb01_debit_account_name" name="debit_account_name"
                                 value="{{ old('debit_account_name', $topupType->default_debit_account_name) }}"
-                                class="w-full rounded-lg border-gray-300 focus:border-teal-600 focus:ring-teal-600"
-                                placeholder="Nama rekening debet" required>
+                                placeholder="Masukkan nama rekening" required>
+
                         </div>
 
+
+                        {{-- NOMINAL DEBET --}}
                         <div>
-                            <label for="pb01_debit_amount" class="mb-1 block text-sm font-medium text-gray-700">
-                                Nominal Debet (Rp)
+
+                            <label for="pb01_debit_amount">
+                                Nominal Debet
                             </label>
 
                             <input type="number" id="pb01_debit_amount" name="debit_amount" value="{{ old('debit_amount') }}"
-                                min="1" step="0.01"
-                                class="pb01-amount w-full rounded-lg border-gray-300 focus:border-teal-600 focus:ring-teal-600"
-                                placeholder="Contoh: 1000000" required>
+                                min="1" step="0.01" class="pb01-amount" placeholder="Contoh: 1000000" required>
 
-                            <p id="pb01_debit_amount_error" class="mt-1 hidden text-xs text-red-600">
+                            <p id="pb01_debit_amount_error" class="hidden">
                                 Nominal Debet harus berupa angka.
                             </p>
+
                         </div>
 
+
+                        {{-- KETERANGAN DEBET --}}
                         <div class="md:col-span-2">
-                            <label for="pb01_debit_description" class="mb-1 block text-sm font-medium text-gray-700">
+
+                            <label for="pb01_debit_description">
                                 Keterangan Debet
                             </label>
 
                             <textarea id="pb01_debit_description" name="debit_description" rows="3"
-                                class="w-full rounded-lg border-gray-300 focus:border-teal-600 focus:ring-teal-600"
-                                placeholder="Keterangan transaksi debet">{{ old('debit_description', $topupType->default_debit_description) }}</textarea>
+                                placeholder="Masukkan keterangan transaksi debet">{{ old('debit_description', $topupType->default_debit_description) }}</textarea>
+
                         </div>
 
 
                         {{-- KREDIT --}}
                         <div class="mt-4 md:col-span-2">
-                            <div class="border-b border-gray-200 pb-2">
-                                <h3 class="text-lg font-semibold text-gray-800">
-                                    Kredit
-                                </h3>
 
-                                <p class="text-sm text-gray-500">
+                            <div>
+                                <h3>Kredit</h3>
+
+                                <p>
                                     Data rekening yang akan dikredit.
                                 </p>
                             </div>
+
                         </div>
 
+
+                        {{-- NOMOR REKENING KREDIT --}}
                         <div>
-                            <label for="pb01_credit_account_number" class="mb-1 block text-sm font-medium text-gray-700">
+
+                            <label for="pb01_credit_account_number">
                                 Nomor Rekening Kredit
                             </label>
 
                             <input type="text" id="pb01_credit_account_number" name="credit_account_number"
                                 value="{{ old('credit_account_number', $topupType->default_credit_account_number) }}"
-                                maxlength="16" inputmode="numeric" pattern="[0-9]*"
-                                class="pb01-number w-full rounded-lg border-gray-300 focus:border-teal-600 focus:ring-teal-600"
-                                placeholder="Nomor rekening kredit" required>
+                                maxlength="16" inputmode="numeric" pattern="[0-9]*" class="pb01-number"
+                                placeholder="Masukkan nomor rekening" required>
 
-                            <p id="pb01_credit_account_number_error" class="mt-1 hidden text-xs text-red-600">
+                            <p id="pb01_credit_account_number_error" class="hidden">
                                 Nomor rekening hanya boleh berisi angka.
                             </p>
+
                         </div>
 
+
+                        {{-- NAMA REKENING KREDIT --}}
                         <div>
-                            <label for="pb01_credit_account_name" class="mb-1 block text-sm font-medium text-gray-700">
+
+                            <label for="pb01_credit_account_name">
                                 Nama Rekening Kredit
                             </label>
 
                             <input type="text" id="pb01_credit_account_name" name="credit_account_name"
                                 value="{{ old('credit_account_name', $topupType->default_credit_account_name) }}"
-                                class="w-full rounded-lg border-gray-300 focus:border-teal-600 focus:ring-teal-600"
-                                placeholder="Nama rekening kredit" required>
+                                placeholder="Masukkan nama rekening" required>
+
                         </div>
 
+
+                        {{-- NOMINAL KREDIT --}}
                         <div>
-                            <label for="pb01_credit_amount" class="mb-1 block text-sm font-medium text-gray-700">
-                                Nominal Kredit (Rp)
+
+                            <label for="pb01_credit_amount">
+                                Nominal Kredit
                             </label>
 
                             <input type="number" id="pb01_credit_amount" name="credit_amount" value="{{ old('credit_amount') }}"
-                                min="1" step="0.01"
-                                class="pb01-amount w-full rounded-lg border-gray-300 focus:border-teal-600 focus:ring-teal-600"
-                                placeholder="Contoh: 1000000" required>
+                                min="1" step="0.01" class="pb01-amount" placeholder="Contoh: 1000000" required>
 
-                            <p id="pb01_credit_amount_error" class="mt-1 hidden text-xs text-red-600">
+                            <p id="pb01_credit_amount_error" class="hidden">
                                 Nominal Kredit harus berupa angka.
                             </p>
+
                         </div>
 
+
+                        {{-- KETERANGAN KREDIT --}}
                         <div class="md:col-span-2">
-                            <label for="pb01_credit_description" class="mb-1 block text-sm font-medium text-gray-700">
+
+                            <label for="pb01_credit_description">
                                 Keterangan Kredit
                             </label>
 
                             <textarea id="pb01_credit_description" name="credit_description" rows="3"
-                                class="w-full rounded-lg border-gray-300 focus:border-teal-600 focus:ring-teal-600"
-                                placeholder="Keterangan transaksi kredit">{{ old('credit_description', $topupType->default_credit_description) }}</textarea>
+                                placeholder="Masukkan keterangan transaksi kredit">{{ old('credit_description', $topupType->default_credit_description) }}</textarea>
+
                         </div>
 
                     </div>
 
+
                     {{-- SIMPAN PB01 --}}
-                    <div class="mt-6 flex justify-end">
-                        <button type="submit"
-                            class="pb01-save hidden rounded-lg bg-teal-700 px-5 py-2.5 font-medium text-white hover:bg-teal-800">
+                    <div class="mt-6">
+
+                        <button type="submit" class="pb01-save hidden">
                             Simpan PB01
                         </button>
+
                     </div>
 
                 </form>
+
             </div>
 
 
             {{-- ==================== PB 02 ==================== --}}
         @elseif ($documentType === 'pb02')
 
-            <div class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+            <div class="brk-pb-form-card brk-form-animate brk-form-delay-1">
 
-                <div class="mb-6 border-b border-gray-200 pb-3">
-                    <h2 class="text-xl font-bold text-gray-800">
-                        PB 02
-                    </h2>
+                <div class="brk-pb-form-card-header">
 
-                    <p class="mt-1 text-sm text-gray-500">
-                        Penerusan ke BI
-                    </p>
+                    <div class="brk-pb-form-card-title">
+
+                        <div class="brk-pb-form-badge pb02">
+                            PB 02
+                        </div>
+
+                        <div>
+                            <h2>Penerusan ke BI</h2>
+
+                            <p>
+                                Formulir transaksi pemindahbukuan untuk penerusan ke Bank Indonesia.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <div class="brk-form-status">
+                        <span class="brk-form-status-dot"></span>
+                        <span>Data transaksi</span>
+                    </div>
+
                 </div>
+
 
                 <form method="POST" action="{{ route('topup.generator.pb02.store', [
                 'topupType' => $topupType->slug,
@@ -253,170 +339,201 @@
 
                         {{-- NOMOR PB --}}
                         <div>
-                            <label for="pb02_number" class="mb-1 block text-sm font-medium text-gray-700">
+
+                            <label for="pb02_number">
                                 Nomor PB
                             </label>
 
                             <input type="text" id="pb02_number" name="pb_number" autocomplete="off"
-                                value="{{ old('pb_number') }}"
-                                class="w-full rounded-lg border-gray-300 focus:border-teal-600 focus:ring-teal-600"
-                                placeholder="Masukkan nomor PB" required>
+                                value="{{ old('pb_number') }}" placeholder="Masukkan nomor PB" required>
+
                         </div>
+
 
                         {{-- PERIODE --}}
                         <div class="form-group">
-                            <label for="pb02_date_range">Tanggal</label>
+
+                            <label for="pb02_date_range">
+                                Periode Transaksi
+                            </label>
 
                             <input type="text" id="pb02_date_range" placeholder="Pilih rentang tanggal" autocomplete="off"
                                 class="form-control">
 
                             <input type="hidden" name="date_from" id="pb02_date_from">
                             <input type="hidden" name="date_until" id="pb02_date_until">
+
                         </div>
 
 
                         {{-- DEBET --}}
                         <div class="mt-4 md:col-span-2">
-                            <div class="border-b border-gray-200 pb-2">
-                                <h3 class="text-lg font-semibold text-gray-800">
-                                    Debet
-                                </h3>
 
-                                <p class="text-sm text-gray-500">
+                            <div>
+                                <h3>Debet</h3>
+
+                                <p>
                                     Data rekening yang akan didebet.
                                 </p>
                             </div>
+
                         </div>
 
+
+                        {{-- NOMOR REKENING DEBET --}}
                         <div>
-                            <label for="pb02_debit_account_number" class="mb-1 block text-sm font-medium text-gray-700">
+
+                            <label for="pb02_debit_account_number">
                                 Nomor Rekening Debet
                             </label>
 
                             <input type="text" id="pb02_debit_account_number" name="debit_account_number"
                                 value="{{ old('debit_account_number', $topupType->default_debit_account_number) }}"
-                                maxlength="16" inputmode="numeric" pattern="[0-9]*"
-                                class="pb02-number w-full rounded-lg border-gray-300 focus:border-teal-600 focus:ring-teal-600"
-                                placeholder="Nomor rekening debet" required>
+                                maxlength="16" inputmode="numeric" pattern="[0-9]*" class="pb02-number"
+                                placeholder="Masukkan nomor rekening" required>
 
-                            <p id="pb02_debit_account_number_error" class="mt-1 hidden text-xs text-red-600">
+                            <p id="pb02_debit_account_number_error" class="hidden">
                                 Nomor rekening hanya boleh berisi angka.
                             </p>
+
                         </div>
 
+
+                        {{-- NAMA REKENING DEBET --}}
                         <div>
-                            <label for="pb02_debit_account_name" class="mb-1 block text-sm font-medium text-gray-700">
+
+                            <label for="pb02_debit_account_name">
                                 Nama Rekening Debet
                             </label>
 
                             <input type="text" id="pb02_debit_account_name" name="debit_account_name"
                                 value="{{ old('debit_account_name', $topupType->default_debit_account_name) }}"
-                                class="w-full rounded-lg border-gray-300 focus:border-teal-600 focus:ring-teal-600"
-                                placeholder="Nama rekening debet" required>
+                                placeholder="Masukkan nama rekening" required>
+
                         </div>
 
+
+                        {{-- NOMINAL DEBET --}}
                         <div>
-                            <label for="pb02_debit_amount" class="mb-1 block text-sm font-medium text-gray-700">
-                                Nominal Debet (Rp)
+
+                            <label for="pb02_debit_amount">
+                                Nominal Debet
                             </label>
 
                             <input type="number" id="pb02_debit_amount" name="debit_amount" value="{{ old('debit_amount') }}"
-                                min="1" step="0.01"
-                                class="pb02-amount w-full rounded-lg border-gray-300 focus:border-teal-600 focus:ring-teal-600"
-                                placeholder="Contoh: 1000000" required>
+                                min="1" step="0.01" class="pb02-amount" placeholder="Contoh: 1000000" required>
 
-                            <p id="pb02_debit_amount_error" class="mt-1 hidden text-xs text-red-600">
+                            <p id="pb02_debit_amount_error" class="hidden">
                                 Nominal Debet harus berupa angka.
                             </p>
+
                         </div>
 
+
+                        {{-- KETERANGAN DEBET --}}
                         <div class="md:col-span-2">
-                            <label for="pb02_debit_description" class="mb-1 block text-sm font-medium text-gray-700">
+
+                            <label for="pb02_debit_description">
                                 Keterangan Debet
                             </label>
 
                             <textarea id="pb02_debit_description" name="debit_description" rows="3"
-                                class="w-full rounded-lg border-gray-300 focus:border-teal-600 focus:ring-teal-600"
-                                placeholder="Keterangan transaksi debet">{{ old('debit_description', $topupType->default_debit_description) }}</textarea>
+                                placeholder="Masukkan keterangan transaksi debet">{{ old('debit_description', $topupType->default_debit_description) }}</textarea>
+
                         </div>
 
 
                         {{-- KREDIT --}}
                         <div class="mt-4 md:col-span-2">
-                            <div class="border-b border-gray-200 pb-2">
-                                <h3 class="text-lg font-semibold text-gray-800">
-                                    Kredit
-                                </h3>
 
-                                <p class="text-sm text-gray-500">
+                            <div>
+                                <h3>Kredit</h3>
+
+                                <p>
                                     Data rekening yang akan dikredit.
                                 </p>
+
                             </div>
+
                         </div>
 
+
+                        {{-- NOMOR REKENING KREDIT --}}
                         <div>
-                            <label for="pb02_credit_account_number" class="mb-1 block text-sm font-medium text-gray-700">
+
+                            <label for="pb02_credit_account_number">
                                 Nomor Rekening Kredit
                             </label>
 
                             <input type="text" id="pb02_credit_account_number" name="credit_account_number"
                                 value="{{ old('credit_account_number', $topupType->default_credit_account_number) }}"
-                                maxlength="16" inputmode="numeric" pattern="[0-9]*"
-                                class="pb02-number w-full rounded-lg border-gray-300 focus:border-teal-600 focus:ring-teal-600"
-                                placeholder="Nomor rekening kredit" required>
+                                maxlength="16" inputmode="numeric" pattern="[0-9]*" class="pb02-number"
+                                placeholder="Masukkan nomor rekening" required>
 
-                            <p id="pb02_credit_account_number_error" class="mt-1 hidden text-xs text-red-600">
+                            <p id="pb02_credit_account_number_error" class="hidden">
                                 Nomor rekening hanya boleh berisi angka.
                             </p>
+
                         </div>
 
+
+                        {{-- NAMA REKENING KREDIT --}}
                         <div>
-                            <label for="pb02_credit_account_name" class="mb-1 block text-sm font-medium text-gray-700">
+
+                            <label for="pb02_credit_account_name">
                                 Nama Rekening Kredit
                             </label>
 
                             <input type="text" id="pb02_credit_account_name" name="credit_account_name"
                                 value="{{ old('credit_account_name', $topupType->default_credit_account_name) }}"
-                                class="w-full rounded-lg border-gray-300 focus:border-teal-600 focus:ring-teal-600"
-                                placeholder="Nama rekening kredit" required>
+                                placeholder="Masukkan nama rekening" required>
+
                         </div>
 
+
+                        {{-- NOMINAL KREDIT --}}
                         <div>
-                            <label for="pb02_credit_amount" class="mb-1 block text-sm font-medium text-gray-700">
-                                Nominal Kredit (Rp)
+
+                            <label for="pb02_credit_amount">
+                                Nominal Kredit
                             </label>
 
                             <input type="number" id="pb02_credit_amount" name="credit_amount" value="{{ old('credit_amount') }}"
-                                min="1" step="0.01"
-                                class="pb02-amount w-full rounded-lg border-gray-300 focus:border-teal-600 focus:ring-teal-600"
-                                placeholder="Contoh: 1000000" required>
+                                min="1" step="0.01" class="pb02-amount" placeholder="Contoh: 1000000" required>
 
-                            <p id="pb02_credit_amount_error" class="mt-1 hidden text-xs text-red-600">
+                            <p id="pb02_credit_amount_error" class="hidden">
                                 Nominal Kredit harus berupa angka.
                             </p>
+
                         </div>
 
+
+                        {{-- KETERANGAN KREDIT --}}
                         <div class="md:col-span-2">
-                            <label for="pb02_credit_description" class="mb-1 block text-sm font-medium text-gray-700">
+
+                            <label for="pb02_credit_description">
                                 Keterangan Kredit
                             </label>
 
                             <textarea id="pb02_credit_description" name="credit_description" rows="3"
-                                class="w-full rounded-lg border-gray-300 focus:border-teal-600 focus:ring-teal-600"
-                                placeholder="Keterangan transaksi kredit">{{ old('credit_description', $topupType->default_credit_description) }}</textarea>
+                                placeholder="Masukkan keterangan transaksi kredit">{{ old('credit_description', $topupType->default_credit_description) }}</textarea>
+
                         </div>
 
                     </div>
 
+
                     {{-- SIMPAN PB02 --}}
-                    <div class="mt-6 flex justify-end">
-                        <button type="submit"
-                            class="pb02-save hidden rounded-lg bg-teal-700 px-5 py-2.5 font-medium text-white hover:bg-teal-800">
+                    <div class="mt-6">
+
+                        <button type="submit" class="pb02-save hidden">
                             Simpan PB02
                         </button>
+
                     </div>
 
                 </form>
+
             </div>
 
         @endif
@@ -436,8 +553,11 @@
                 const inputs = form.querySelectorAll(`.${numberClass}, .${amountClass}`);
 
                 inputs.forEach(function (input) {
+
                     function validate() {
+
                         const error = document.getElementById(input.id + '_error');
+
                         if (!error) return true;
 
                         const value = input.value.trim();
@@ -451,13 +571,17 @@
                         }
 
                         if (isValid) {
+
                             input.classList.remove('!border-red-500');
                             input.classList.add('!border-gray-300');
                             error.classList.add('hidden');
+
                         } else {
+
                             input.classList.remove('!border-gray-300');
                             input.classList.add('!border-red-500');
                             error.classList.remove('hidden');
+
                         }
 
                         return isValid;
@@ -465,10 +589,13 @@
 
                     input.addEventListener('input', validate);
                     input.addEventListener('blur', validate);
+
                 });
             }
 
+
             function setupDateRange(formSelector, rangeId, fromHiddenId, untilHiddenId) {
+
                 const form = document.querySelector(formSelector);
 
                 if (!form) {
@@ -484,38 +611,52 @@
                 }
 
                 flatpickr(rangeInput, {
+
                     mode: 'range',
+
                     dateFormat: 'd-m-Y',
+
                     locale: {
                         firstDayOfWeek: 1
                     },
+
                     onChange: function (selectedDates) {
 
                         if (selectedDates.length >= 1) {
+
                             const from = selectedDates[0];
 
                             fromHidden.value =
                                 from.getFullYear() + '-' +
                                 String(from.getMonth() + 1).padStart(2, '0') + '-' +
                                 String(from.getDate()).padStart(2, '0');
+
                         }
 
                         if (selectedDates.length === 2) {
+
                             const until = selectedDates[1];
 
                             untilHidden.value =
                                 until.getFullYear() + '-' +
                                 String(until.getMonth() + 1).padStart(2, '0') + '-' +
                                 String(until.getDate()).padStart(2, '0');
+
                         } else {
+
                             untilHidden.value = '';
+
                         }
+
                     }
+
                 });
+
             }
 
 
             function setupSaveButton(formSelector, amountSelector, buttonSelector) {
+
                 const form = document.querySelector(formSelector);
 
                 if (!form) {
@@ -530,6 +671,7 @@
                 }
 
                 function checkAmount() {
+
                     const filled = Array.from(amounts).every(function (input) {
                         return input.value.trim() !== '';
                     });
@@ -539,6 +681,7 @@
                     } else {
                         button.classList.add('hidden');
                     }
+
                 }
 
                 amounts.forEach(function (input) {
@@ -546,6 +689,7 @@
                 });
 
                 checkAmount();
+
             }
 
 
@@ -563,6 +707,7 @@
                 'pb02_date_until'
             );
 
+
             setupNumberValidation(
                 '[data-form="pb01"]',
                 'pb01-number',
@@ -574,6 +719,7 @@
                 'pb02-number',
                 'pb02-amount'
             );
+
 
             setupSaveButton(
                 '[data-form="pb01"]',

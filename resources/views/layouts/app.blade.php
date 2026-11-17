@@ -8,245 +8,162 @@
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-    <title>@yield('title', 'Generator PB') - BRK Syariah</title>
-
-    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-
     @stack('styles')
-
-    <style>
-        body {
-            min-height: 100vh;
-        }
-
-        .app-layout {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        .app-sidebar {
-            position: relative;
-            width: 255px;
-            flex-shrink: 0;
-            padding: 30px 18px;
-            color: #fff;
-            background: linear-gradient(165deg, #286963, #204F4B);
-        }
-
-        .app-brand {
-            margin: 0 10px 6px;
-            color: #fff;
-            font-size: 22px;
-            font-weight: 750;
-        }
-
-        .app-brand-subtitle {
-            margin: 0 10px 32px;
-            color: #D2E4DE;
-            font-size: 12px;
-        }
-
-        .app-nav-label {
-            margin: 25px 10px 10px;
-            color: #C1D8D1;
-            font-size: 10px;
-            font-weight: 750;
-            letter-spacing: 1.2px;
-            text-transform: uppercase;
-        }
-
-        .app-nav-item {
-            display: block;
-            margin-bottom: 6px;
-            padding: 12px 14px;
-            border: 1px solid transparent;
-            border-radius: 9px;
-            color: #F7FBF9;
-            font-size: 13px;
-            text-decoration: none;
-            transition: 180ms ease;
-        }
-
-        .app-nav-item:hover {
-            padding-left: 18px;
-            color: #fff;
-            background: rgba(255, 255, 255, .11);
-        }
-
-        .app-nav-item.active {
-            color: #204F4B;
-            background: #fff;
-            font-weight: 700;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, .09);
-        }
-
-        .app-main {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .app-topbar {
-            position: sticky;
-            top: 0;
-            z-index: 5;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            padding: 19px 30px;
-            background: rgba(255, 255, 255, .96);
-            border-bottom: 1px solid #DCE4E0;
-        }
-
-        .app-topbar-label {
-            color: #6B7773;
-            font-size: 13px;
-        }
-
-        .app-user-area {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-
-        .app-user-name {
-            color: #303C3A;
-            font-size: 13px;
-            font-weight: 700;
-        }
-
-        .app-logout-button {
-            padding: 9px 14px;
-            border: 1px solid #DCE4E0;
-            border-radius: 9px;
-            color: #286963;
-            background: #fff;
-            font-weight: 650;
-            cursor: pointer;
-            transition: 180ms ease;
-        }
-
-        .app-logout-button:hover {
-            color: #fff;
-            background: #286963;
-        }
-
-        .app-content {
-            max-width: 1440px;
-            padding: 32px;
-            margin: 0 auto;
-        }
-
-        @media (max-width: 800px) {
-            .app-layout {
-                flex-direction: column;
-            }
-
-            .app-sidebar {
-                width: 100%;
-                padding: 20px 16px;
-            }
-
-            .app-brand-subtitle {
-                margin-bottom: 18px;
-            }
-
-            .app-nav-label {
-                margin-top: 16px;
-            }
-
-            .app-topbar {
-                position: static;
-                padding: 16px;
-            }
-
-            .app-content {
-                padding: 22px 16px;
-            }
-
-            .app-user-area {
-                gap: 8px;
-            }
-        }
-    </style>
 </head>
 
-<body>
+<body class="brk-app-body">
+
     <div class="app-layout">
+
         <aside class="app-sidebar">
-            <div class="app-brand">Generator PB</div>
-            <p class="app-brand-subtitle">BRK Syariah · E-Channel</p>
 
-            <div class="app-nav-label">Menu Utama</div>
+            <div class="app-sidebar-decoration app-sidebar-decoration-one"></div>
+            <div class="app-sidebar-decoration app-sidebar-decoration-two"></div>
 
-            <a href="{{ route('dashboard') }}"
-                class="app-nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
-                Dashboard
-            </a>
+            <div class="app-brand-wrap">
+                <div class="app-brand-mark">
+                    <span>BRK</span>
+                </div>
 
-            <div class="app-nav-label">Transaksi PB</div>
+                <div>
+                    <div class="app-brand">Generator PB</div>
+                    <p class="app-brand-subtitle">BRK Syariah · E-Channel</p>
+                </div>
+            </div>
 
-            @foreach (\App\Models\TopupType::where('is_active', true)->orderBy('name')->get() as $topupType)
-                <a href="{{ route('topup.show', $topupType->slug) }}"
-                    class="app-nav-item {{ request()->routeIs('topup.show') && request()->route('topupType')?->slug === $topupType->slug ? 'active' : '' }}">
-                    Top Up {{ $topupType->name }}
+            <div class="app-nav">
+
+                <div class="app-nav-label">
+                    <span>Workspace</span>
+                </div>
+
+                <a href="{{ route('dashboard') }}"
+                    class="app-nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
+                    <span class="app-nav-icon">⌂</span>
+                    <span>Dashboard</span>
                 </a>
-            @endforeach
 
+                <div class="app-nav-label">
+                    <span>Transaksi PB</span>
+                </div>
 
-            <div class="app-nav-label">Administrasi</div>
+                @foreach (\App\Models\TopupType::where('is_active', true)->orderBy('name')->get() as $topupType)
+                    <a href="{{ route('topup.show', $topupType->slug) }}"
+                        class="app-nav-item {{ request()->routeIs('topup.show') && request()->route('topupType')?->slug === $topupType->slug ? 'active' : '' }}">
+                        <span class="app-nav-icon">＋</span>
+                        <span>Top Up {{ $topupType->name }}</span>
+                    </a>
+                @endforeach
 
-            <a href="{{ route('topup-types.index') }}"
-                class="app-nav-item {{ request()->routeIs('topup-types.*') ? 'active' : '' }}">
-                Kelola Jenis Top Up
-            </a>
+                <div class="app-nav-label">
+                    <span>Administrasi</span>
+                </div>
 
-            <a href="{{ route('leaders.index') }}"
-                class="app-nav-item {{ request()->routeIs('leaders.*') ? 'active' : '' }}">
-                Kelola Pimpinan
-            </a>
-
-            @if (auth()->user()->role === 'admin')
-                <a href="{{ route('admin.users.index') }}"
-                    class="app-nav-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                    Kelola Pengguna
+                <a href="{{ route('topup-types.index') }}"
+                    class="app-nav-item {{ request()->routeIs('topup-types.*') ? 'active' : '' }}">
+                    <span class="app-nav-icon">▦</span>
+                    <span>Kelola Jenis Top Up</span>
                 </a>
-            @endif
+
+                <a href="{{ route('leaders.index') }}"
+                    class="app-nav-item {{ request()->routeIs('leaders.*') ? 'active' : '' }}">
+                    <span class="app-nav-icon">♙</span>
+                    <span>Kelola Pimpinan</span>
+                </a>
+
+                @if (auth()->user()->role === 'admin')
+                    <a href="{{ route('admin.users.index') }}"
+                        class="app-nav-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                        <span class="app-nav-icon">♙</span>
+                        <span>Kelola Pengguna</span>
+                    </a>
+                @endif
+
+            </div>
+
+            <div class="app-sidebar-footer">
+                <span class="app-status-dot"></span>
+                <span>Sistem aktif</span>
+            </div>
 
         </aside>
 
         <main class="app-main">
+
             <header class="app-topbar">
-                <div class="app-topbar-label">
-                    @yield('page-label', 'Sistem Pembuatan Dokumen PB')
+
+                <div class="app-topbar-left">
+                    <div class="app-topbar-mobile-brand">
+                        <span>BRK</span>
+                    </div>
+
+                    <div>
+                        <div class="app-topbar-label">
+                            @yield('page-label', 'Sistem Pembuatan Dokumen PB')
+                        </div>
+
+                        <div class="app-topbar-title">
+                            Generator PB
+                        </div>
+                    </div>
                 </div>
 
                 <div class="app-user-area">
-                    <span class="app-user-name">
-                        {{ auth()->user()->name }}
-                    </span>
+
+                    <div class="app-user-avatar">
+                        {{ strtoupper(substr(auth()->user()->name, 0, 1)) }}
+                    </div>
+
+                    <div class="app-user-info">
+                        <span class="app-user-name">
+                            {{ auth()->user()->name }}
+                        </span>
+
+                        <span class="app-user-role">
+                            {{ ucfirst(auth()->user()->role) }}
+                        </span>
+                    </div>
 
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
+
                         <button type="submit" class="app-logout-button">
-                            Keluar
+                            <span>Keluar</span>
                         </button>
                     </form>
+
                 </div>
+
             </header>
 
             <section class="app-content">
+
                 @if (session('success'))
-                    <div id="success-alert" class="alert alert-success">
-                        {{ session('success') }}
+                    <div id="success-alert" class="alert alert-success brk-alert brk-alert-success">
+                        <div class="brk-alert-icon">✓</div>
+
+                        <div class="brk-alert-content">
+                            <strong>Berhasil</strong>
+                            <span>{{ session('success') }}</span>
+                        </div>
+
+                        <button type="button" class="brk-alert-close" onclick="this.closest('.alert').remove()"
+                            aria-label="Tutup">
+                            ×
+                        </button>
                     </div>
                 @endif
 
                 @yield('content')
+
             </section>
+
         </main>
+
     </div>
+
     @stack('scripts')
+
 </body>
 
 </html>

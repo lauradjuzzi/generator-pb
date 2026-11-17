@@ -63,12 +63,43 @@ class PbDocumentController extends Controller
         return $this->storePb($request, $topupType, 'pb02');
     }
 
+    private function normalizeAmountInput($value)
+    {
+        if ($value === null || $value === '') {
+            return $value;
+        }
+
+        $value = trim((string) $value);
+
+        if (str_contains($value, ',') && str_contains($value, '.')) {
+            if (strrpos($value, ',') > strrpos($value, '.')) {
+                $value = str_replace('.', '', $value);
+                $value = str_replace(',', '.', $value);
+            } else {
+                $value = str_replace(',', '', $value);
+            }
+        } elseif (str_contains($value, ',')) {
+            $value = str_replace(',', '.', $value);
+        }
+
+        return $value;
+    }
+
     private function storePb(
         Request $request,
         TopupType $topupType,
         string $documentType
     ) {
         abort_unless($topupType->is_active, 404);
+
+        $request->merge([
+            'debit_amount' => $this->normalizeAmountInput(
+                $request->input('debit_amount')
+            ),
+            'credit_amount' => $this->normalizeAmountInput(
+                $request->input('credit_amount')
+            ),
+        ]);
 
         $validated = $request->validate([
             'pb_number' => ['required', 'string', 'max:100'],
@@ -259,6 +290,22 @@ class PbDocumentController extends Controller
         Request $request,
         PbDocument $document
     ) {
+
+        $request->merge([
+            'pb01_debit_amount' => $this->normalizeAmountInput(
+                $request->input('pb01_debit_amount')
+            ),
+            'pb01_credit_amount' => $this->normalizeAmountInput(
+                $request->input('pb01_credit_amount')
+            ),
+            'pb02_debit_amount' => $this->normalizeAmountInput(
+                $request->input('pb02_debit_amount')
+            ),
+            'pb02_credit_amount' => $this->normalizeAmountInput(
+                $request->input('pb02_credit_amount')
+            ),
+        ]);
+
         $validated = $request->validate([
             'pb01_number' => ['nullable', 'string', 'max:100'],
             'pb02_number' => ['nullable', 'string', 'max:100'],

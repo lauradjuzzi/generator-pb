@@ -421,15 +421,6 @@
 
     <body>
         <div class="page">
-            <header class="page-header">
-                <div>
-                    <div class="eyebrow">SISTEM INTERNAL</div>
-                    <h1>Kelola User</h1>
-                    <p class="subtitle">
-                        Pengelolaan akun pengguna Generator Pemindah Pembukuan.
-                    </p>
-                </div>
-            </header>
 
             @if (session('success'))
                 <div class="alert alert-success">
