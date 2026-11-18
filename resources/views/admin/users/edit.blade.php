@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Edit Akun | Generator PB</title>
+    <title>Edit Akun | E-PB</title>
     <style>
         :root {
             --teal: #286963;
@@ -194,7 +194,7 @@
         <div class="eyebrow">SISTEM INTERNAL</div>
         <h1>Edit Akun</h1>
         <p class="subtitle">
-            Perbarui informasi akun pengguna Generator PB.
+            Perbarui informasi akun pengguna E-PB.
         </p>
 
         @if ($errors->any())

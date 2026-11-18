@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login | Generator PB</title>
+    <title>Login | E-PB</title>
 
     <style>
         :root {
@@ -1075,7 +1075,7 @@
                 </div>
 
                 <h1 class="brand-title" data-depth="title">
-                    Generator
+                    E
                     <span class="red">PB</span>
                 </h1>
 
@@ -1103,7 +1103,7 @@
 
                             <p class="login-description">
                                 Masukkan akun milikmu untuk melanjutkan
-                                ke dashboard Generator PB.
+                                ke dashboard E-PB.
                             </p>
                         </div>
 
@@ -1163,7 +1163,7 @@
                     </form>
 
                     <div class="login-footer">
-                        Generator PB
+                        GENERATOR PB
                     </div>
 
                 </div>

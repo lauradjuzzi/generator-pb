@@ -26,7 +26,7 @@
                 </div>
 
                 <div>
-                    <div class="app-brand">Generator PB</div>
+                    <div class="app-brand">E-PB</div>
                     <p class="app-brand-subtitle">BRK Syariah · E-Channel</p>
                 </div>
             </div>
@@ -103,7 +103,7 @@
                         </div>
 
                         <div class="app-topbar-title">
-                            Generator PB
+                            E-PB
                         </div>
                     </div>
                 </div>

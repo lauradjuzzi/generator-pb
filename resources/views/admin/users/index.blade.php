@@ -530,7 +530,7 @@
                 <section class="card">
                     <div class="card-header">
                         <h2>Daftar Akun</h2>
-                        <p>Akun yang terdaftar pada sistem Generator PB.</p>
+                        <p>Akun yang terdaftar pada sistem E-PB.</p>
                     </div>
 
                     <div class="card-body">
@@ -616,7 +616,7 @@
             </div>
 
             <footer class="page-footer">
-                Generator PB &middot; Divisi E-Channel &middot; Bank Riau Kepri Syariah
+                E-PB &middot; Divisi E-Channel &middot; Bank Riau Kepri Syariah
             </footer>
         </div>
 
