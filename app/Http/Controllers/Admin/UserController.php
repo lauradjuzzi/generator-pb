@@ -110,10 +110,16 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
-        if ($user->id == Auth::id()) {
+        if ($user->id === Auth::id()) {
             return redirect()
                 ->route('admin.users.index')
                 ->with('error', 'Akun yang sedang digunakan tidak dapat dihapus.');
+        }
+
+        if ($user->pbDocuments()->exists()) {
+            return redirect()
+                ->route('admin.users.index')
+                ->with('error', 'Akun tidak dapat dihapus karena masih memiliki riwayat dokumen PB.');
         }
 
         $user->delete();

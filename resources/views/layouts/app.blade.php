@@ -37,7 +37,7 @@
                     <span>Workspace</span>
                 </div>
 
-                <a href="{{ route('dashboard') }}"
+                <a href="{{ route('topup.leave', ['destination' => 'dashboard']) }}"
                     class="app-nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                     <span class="app-nav-icon">⌂</span>
                     <span>Dashboard</span>
@@ -48,7 +48,7 @@
                 </div>
 
                 @foreach (\App\Models\TopupType::where('is_active', true)->orderBy('name')->get() as $topupType)
-                    <a href="{{ route('topup.show', $topupType->slug) }}"
+                    <a href="{{ route('topup.leave-to', $topupType->slug) }}"
                         class="app-nav-item {{ request()->routeIs('topup.show') && request()->route('topupType')?->slug === $topupType->slug ? 'active' : '' }}">
                         <span class="app-nav-icon">＋</span>
                         <span>Top Up {{ $topupType->name }}</span>
@@ -59,20 +59,20 @@
                     <span>Administrasi</span>
                 </div>
 
-                <a href="{{ route('topup-types.index') }}"
+                <a href="{{ route('topup.leave', ['destination' => 'topup-types']) }}"
                     class="app-nav-item {{ request()->routeIs('topup-types.*') ? 'active' : '' }}">
                     <span class="app-nav-icon">▦</span>
                     <span>Kelola Jenis Top Up</span>
                 </a>
 
-                <a href="{{ route('leaders.index') }}"
+                <a href="{{ route('topup.leave', ['destination' => 'leaders']) }}"
                     class="app-nav-item {{ request()->routeIs('leaders.*') ? 'active' : '' }}">
                     <span class="app-nav-icon">♙</span>
                     <span>Kelola Pimpinan</span>
                 </a>
 
                 @if (auth()->user()->role === 'admin')
-                    <a href="{{ route('admin.users.index') }}"
+                    <a href="{{ route('topup.leave', ['destination' => 'users']) }}"
                         class="app-nav-item {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
                         <span class="app-nav-icon">♙</span>
                         <span>Kelola Pengguna</span>

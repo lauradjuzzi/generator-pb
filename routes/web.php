@@ -53,6 +53,49 @@ Route::middleware('auth')->group(function () {
     Route::patch('/topup-types/{topupType}/toggle-status', [TopupTypeController::class, 'toggleStatus'])
         ->name('topup-types.toggle-status');
 
+    Route::get('/topup/leave/{destination}', function (
+        Request $request,
+        string $destination
+    ) {
+        $request->session()->forget([
+            'pb_active_topup_id',
+            'pb_active_group_id',
+        ]);
+
+        if ($destination === 'dashboard') {
+            return redirect()->route('dashboard');
+        }
+
+        if ($destination === 'topup-types') {
+            return redirect()->route('topup-types.index');
+        }
+
+        if ($destination === 'leaders') {
+            return redirect()->route('leaders.index');
+        }
+
+        if ($destination === 'users') {
+            return redirect()->route('admin.users.index');
+        }
+
+        abort(404);
+    })->name('topup.leave');
+
+    Route::get('/topup/leave-to/{topupType:slug}', function (
+        Request $request,
+        \App\Models\TopupType $topupType
+    ) {
+        abort_unless($topupType->is_active, 404);
+
+        $request->session()->forget([
+            'pb_active_topup_id',
+            'pb_active_group_id',
+        ]);
+
+        return redirect()->route('topup.show', [
+            'topupType' => $topupType->slug,
+        ]);
+    })->name('topup.leave-to');
 
     Route::get('/topup/{topupType:slug}', function (
         Request $request,
@@ -60,7 +103,26 @@ Route::middleware('auth')->group(function () {
     ) {
         abort_unless($topupType->is_active, 404);
 
-        $pb01 = \App\Models\PbDocument::where('topup_type_id', $topupType->id)
+        $activeTopupId = $request->session()->get('pb_active_topup_id');
+        $activeGroupId = $request->session()->get('pb_active_group_id');
+
+        if (
+            !$activeGroupId ||
+            $activeTopupId !== $topupType->id
+        ) {
+            $activeGroupId = (string) \Illuminate\Support\Str::uuid();
+
+            $request->session()->put([
+                'pb_active_topup_id' => $topupType->id,
+                'pb_active_group_id' => $activeGroupId,
+            ]);
+        }
+
+        $pb01 = \App\Models\PbDocument::where(
+            'excel_group_id',
+            $activeGroupId
+        )
+            ->where('topup_type_id', $topupType->id)
             ->where('created_by', $request->user()->id)
             ->where('is_active', true)
             ->whereNull('generated_at')
@@ -70,7 +132,11 @@ Route::middleware('auth')->group(function () {
             ->latest()
             ->first();
 
-        $pb02 = \App\Models\PbDocument::where('topup_type_id', $topupType->id)
+        $pb02 = \App\Models\PbDocument::where(
+            'excel_group_id',
+            $activeGroupId
+        )
+            ->where('topup_type_id', $topupType->id)
             ->where('created_by', $request->user()->id)
             ->where('is_active', true)
             ->whereNull('generated_at')
@@ -91,11 +157,6 @@ Route::middleware('auth')->group(function () {
         PbDocumentController::class,
         'preview',
     ])->name('topup.generator.preview');
-
-    Route::get('/topup/{topupType:slug}/generator/excel', [
-        PbDocumentController::class,
-        'generateExcel',
-    ])->name('topup.generator.excel');
 
     Route::get('/topup/{topupType:slug}/generator/excel', [
         PbDocumentController::class,

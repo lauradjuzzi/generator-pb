@@ -193,17 +193,19 @@ class PbDocumentController extends Controller
             $user
         ) {
 
-            $existingDocument = PbDocument::where('topup_type_id', $topupType->id)
-                ->where('created_by', $user->id)
-                ->where('is_active', true)
-                ->whereNull('generated_at')
-                ->whereHas('sections', function ($query) use ($documentType) {
-                    $query->where('section_type', $documentType === 'pb01' ? 'pb02' : 'pb01');
-                })
-                ->first();
+            $excelGroupId = session('pb_active_group_id');
 
-            $excelGroupId = $existingDocument?->excel_group_id
-                ?? (string) Str::uuid();
+            if (
+                session('pb_active_topup_id') !== $topupType->id ||
+                !$excelGroupId
+            ) {
+                $excelGroupId = (string) Str::uuid();
+
+                session([
+                    'pb_active_topup_id' => $topupType->id,
+                    'pb_active_group_id' => $excelGroupId,
+                ]);
+            }
 
             if ($pimpinanBagian) {
                 $signatoryType = 'pimpinan_bagian';
@@ -640,7 +642,24 @@ class PbDocumentController extends Controller
 
         $user = $request->user();
 
-        $pb01 = PbDocument::where('topup_type_id', $topupType->id)
+        $activeTopupId = $request->session()->get('pb_active_topup_id');
+        $activeGroupId = $request->session()->get('pb_active_group_id');
+
+        if (
+            $activeTopupId !== $topupType->id ||
+            !$activeGroupId
+        ) {
+            return redirect()
+                ->route('topup.show', [
+                    'topupType' => $topupType->slug,
+                ])
+                ->withErrors([
+                    'preview' => 'Belum ada dokumen PB yang siap untuk di-preview.',
+                ]);
+        }
+
+        $pb01 = PbDocument::where('excel_group_id', $activeGroupId)
+            ->where('topup_type_id', $topupType->id)
             ->where('created_by', $user->id)
             ->where('is_active', true)
             ->whereNull('generated_at')
@@ -651,7 +670,8 @@ class PbDocumentController extends Controller
             ->latest()
             ->first();
 
-        $pb02 = PbDocument::where('topup_type_id', $topupType->id)
+        $pb02 = PbDocument::where('excel_group_id', $activeGroupId)
+            ->where('topup_type_id', $topupType->id)
             ->where('created_by', $user->id)
             ->where('is_active', true)
             ->whereNull('generated_at')
@@ -687,20 +707,19 @@ class PbDocumentController extends Controller
 
         $user = $request->user();
 
-        $activeDocument = PbDocument::where('topup_type_id', $topupType->id)
-            ->where('created_by', $user->id)
-            ->where('is_active', true)
-            ->whereNull('generated_at')
-            ->latest()
-            ->first();
+        $activeTopupId = $request->session()->get('pb_active_topup_id');
+        $activeGroupId = $request->session()->get('pb_active_group_id');
 
-        if (!$activeDocument) {
+        if (
+            $activeTopupId !== $topupType->id ||
+            !$activeGroupId
+        ) {
             abort(404);
         }
 
         $documents = PbDocument::where(
             'excel_group_id',
-            $activeDocument->excel_group_id
+            $activeGroupId
         )
             ->where('topup_type_id', $topupType->id)
             ->where('created_by', $user->id)

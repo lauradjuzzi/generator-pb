@@ -428,6 +428,12 @@
                 </div>
             @endif
 
+            @if (session('error'))
+                <div class="alert alert-danger">
+                    {{ session('error') }}
+                </div>
+            @endif
+
             @if ($errors->any())
                 <div class="alert alert-danger">
                     <strong>Periksa kembali data berikut:</strong>
@@ -453,7 +459,7 @@
                             <div class="field">
                                 <label for="name">Nama Lengkap <span class="required-mark">*</span></label>
                                 <input id="name" name="name" type="text" value="{{ old('name') }}"
-                                    placeholder="Masukkan nama lengkap" required>
+                                    placeholder="Masukkan nama lengkap" autocomplete="off" required>
                             </div>
 
 
@@ -477,7 +483,7 @@
                                     Email <span class="optional">(opsional)</span>
                                 </label>
                                 <input id="email" name="email" type="email" value="{{ old('email') }}"
-                                    placeholder="nama@contoh.com">
+                                    placeholder="nama@contoh.com" autocomplete="off">
                             </div>
 
 
@@ -488,7 +494,7 @@
 
                                 <div class="password-wrapper">
                                     <input id="password" name="password" type="password" minlength="8"
-                                        placeholder="Minimal 8 karakter"
+                                        placeholder="Minimal 8 karakter" autocomplete="off"
                                         class="{{ $errors->has('password') ? 'is-invalid' : '' }}" required>
 
                                     <button type="button" class="toggle-password" onclick="togglePasswordVisibility()"
