@@ -962,6 +962,22 @@ class PbDocumentController extends Controller
         ]);
     }
 
+    public function destroy(PbDocument $document)
+    {
+        DB::transaction(function () use ($document) {
+            if ($document->excel_group_id) {
+                PbDocument::where('excel_group_id', $document->excel_group_id)
+                    ->delete();
+            } else {
+                $document->delete();
+            }
+        });
+
+        return redirect()
+            ->route('dashboard')
+            ->with('success', 'Riwayat PB berhasil dihapus.');
+    }
+
     public function edit(PbDocument $document)
     {
         $document->load([

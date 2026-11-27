@@ -209,6 +209,9 @@ Route::middleware(['auth', 'admin'])
 
         Route::put('/users/{user}', [UserController::class, 'update'])
             ->name('users.update');
+
+        Route::delete('/documents/{document}', [PbDocumentController::class, 'destroy'])
+            ->name('documents.destroy');
     });
 
 Route::redirect('/', '/dashboard');

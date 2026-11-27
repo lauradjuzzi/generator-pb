@@ -266,8 +266,8 @@
         }
 
         /* =========================================================
-                                                                               EDIT MODAL
-                                                                               ========================================================= */
+                                                                                               EDIT MODAL
+                                                                                               ========================================================= */
 
         .edit-modal {
             display: none;
@@ -808,8 +808,8 @@
         }
 
         /* =========================================================
-                                                                                                                   DASHBOARD REDESIGN
-                                                                                                                   ========================================================= */
+                                                                                                                                   DASHBOARD REDESIGN
+                                                                                                                                   ========================================================= */
 
         .dashboard-header {
             position: relative;
@@ -836,8 +836,8 @@
 
 
         /* =========================================================
-                                                                                                                   SUMMARY
-                                                                                                                   ========================================================= */
+                                                                                                                                   SUMMARY
+                                                                                                                                   ========================================================= */
 
         .dashboard-summary {
             grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -957,8 +957,8 @@
 
 
         /* =========================================================
-                                                                                                                   HISTORY PANEL
-                                                                                                                   ========================================================= */
+                                                                                                                                   HISTORY PANEL
+                                                                                                                                   ========================================================= */
 
         .history-card {
             overflow: hidden;
@@ -997,8 +997,8 @@
 
 
         /* =========================================================
-                                                                                                                   SEARCH
-                                                                                                                   ========================================================= */
+                                                                                                                                   SEARCH
+                                                                                                                                   ========================================================= */
 
         .history-search {
             padding: 4px;
@@ -1050,8 +1050,8 @@
 
 
         /* =========================================================
-                                                                                                                   TABLE
-                                                                                                                   ========================================================= */
+                                                                                                                                   TABLE
+                                                                                                                                   ========================================================= */
 
         .history-table {
             min-width: 980px;
@@ -1129,8 +1129,8 @@
 
 
         /* =========================================================
-                                                                                                                   STATUS
-                                                                                                                   ========================================================= */
+                                                                                                                                   STATUS
+                                                                                                                                   ========================================================= */
 
         .status-badge {
             position: relative;
@@ -1178,8 +1178,8 @@
 
 
         /* =========================================================
-                                                                                                                   ACTION
-                                                                                                                   ========================================================= */
+                                                                                                                                   ACTION
+                                                                                                                                   ========================================================= */
 
         .action-group {
             gap: 6px;
@@ -1221,8 +1221,8 @@
 
 
         /* =========================================================
-                                                                                                                   PAGINATION
-                                                                                                                   ========================================================= */
+                                                                                                                                   PAGINATION
+                                                                                                                                   ========================================================= */
 
         .history-pagination {
             margin-top: 16px;
@@ -1284,8 +1284,8 @@
 
 
         /* =========================================================
-                                                                                                                   EMPTY STATE
-                                                                                                                   ========================================================= */
+                                                                                                                                   EMPTY STATE
+                                                                                                                                   ========================================================= */
 
         .empty-history {
             padding: 70px 20px;
@@ -1300,8 +1300,8 @@
 
 
         /* =========================================================
-                                                                                                                   ANIMATION
-                                                                                                                   ========================================================= */
+                                                                                                                                   ANIMATION
+                                                                                                                                   ========================================================= */
 
         .dashboard-header,
         .summary-card,
@@ -1359,8 +1359,8 @@
 
 
         /* =========================================================
-                                                                                                                   MOBILE
-                                                                                                                   ========================================================= */
+                                                                                                                                   MOBILE
+                                                                                                                                   ========================================================= */
 
         @media (max-width: 900px) {
             .dashboard-summary {
@@ -1386,8 +1386,8 @@
         }
 
         /* =========================================================
-                                                                                                           DASHBOARD TABLE REFINEMENT
-                                                                                                           ========================================================= */
+                                                                                                                           DASHBOARD TABLE REFINEMENT
+                                                                                                                           ========================================================= */
 
         .history-table-wrapper {
             width: 100%;
@@ -1716,8 +1716,8 @@
         }
 
         /* =========================================================
-                                   DASHBOARD MOTION POLISH
-                                   ========================================================= */
+                                                   DASHBOARD MOTION POLISH
+                                                   ========================================================= */
 
         .dashboard-header {
             animation: dashboardHeaderIn 520ms cubic-bezier(.22, 1, .36, 1) both;
@@ -1746,8 +1746,8 @@
 
 
         /* =========================================================
-                                   SUMMARY CARD
-                                   ========================================================= */
+                                                   SUMMARY CARD
+                                                   ========================================================= */
 
         .summary-card {
             isolation: isolate;
@@ -1816,8 +1816,8 @@
 
 
         /* =========================================================
-                                   HISTORY CARD
-                                   ========================================================= */
+                                                   HISTORY CARD
+                                                   ========================================================= */
 
         .history-card {
             position: relative;
@@ -1852,8 +1852,8 @@
 
 
         /* =========================================================
-                                   SEARCH
-                                   ========================================================= */
+                                                   SEARCH
+                                                   ========================================================= */
 
         .history-search {
             transition:
@@ -1881,8 +1881,8 @@
 
 
         /* =========================================================
-                                   TABLE
-                                   ========================================================= */
+                                                   TABLE
+                                                   ========================================================= */
 
         .history-table tbody tr {
             transition:
@@ -1905,8 +1905,8 @@
 
 
         /* =========================================================
-                                   ACTION BUTTON
-                                   ========================================================= */
+                                                   ACTION BUTTON
+                                                   ========================================================= */
 
         .history-table tbody td:last-child button,
         .history-table tbody td:last-child a {
@@ -1935,8 +1935,8 @@
 
 
         /* =========================================================
-                                   STATUS
-                                   ========================================================= */
+                                                   STATUS
+                                                   ========================================================= */
 
         .history-table tbody td:nth-child(7) .status-badge {
             transition:
@@ -1951,8 +1951,8 @@
 
 
         /* =========================================================
-           PAGINATION
-           ========================================================= */
+                           PAGINATION
+                           ========================================================= */
 
         .history-pagination {
             display: flex;
@@ -2135,8 +2135,8 @@
 
 
         /* =========================================================
-                                   ENTRANCE MOTION
-                                   ========================================================= */
+                                                   ENTRANCE MOTION
+                                                   ========================================================= */
 
         @keyframes dashboardHeaderIn {
             from {
@@ -2164,8 +2164,8 @@
 
 
         /* =========================================================
-                                   REDUCED MOTION
-                                   ========================================================= */
+                                                   REDUCED MOTION
+                                                   ========================================================= */
 
         @media (prefers-reduced-motion: reduce) {
 
@@ -2431,13 +2431,56 @@
 
                                         <td>
                                             <div class="action-group">
-                                                <button type="button" class="action-button" onclick="openEditModal({{ $document->id }})">
-                                                    Edit
+
+                                                <button type="button" class="action-button" onclick="openEditModal({{ $document->id }})"
+                                                    title="Edit" aria-label="Edit">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                                        xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M4 20H8L19 9C20.1 7.9 20.1 6.1 19 5C17.9 3.9 16.1 3.9 15 5L4 16V20Z"
+                                                            stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+                                                        <path d="M13.5 6.5L17.5 10.5" stroke="currentColor" stroke-width="2"
+                                                            stroke-linecap="round" />
+                                                    </svg>
                                                 </button>
 
-                                                <button type="button" class="action-button" onclick="downloadDocument({{ $document->id }})">
-                                                    Download
+                                                <button type="button" class="action-button" onclick="downloadDocument({{ $document->id }})"
+                                                    title="Download" aria-label="Download">
+                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                                        xmlns="http://www.w3.org/2000/svg">
+                                                        <path d="M12 3V15" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                                                        <path d="M7.5 11.5L12 16L16.5 11.5" stroke="currentColor" stroke-width="2"
+                                                            stroke-linecap="round" stroke-linejoin="round" />
+                                                        <path
+                                                            d="M6.5 19H17.5C19.43 19 21 17.43 21 15.5C21 13.7 19.63 12.22 17.87 12.03C17.43 9.17 14.96 7 12 7C9.54 7 7.4 8.5 6.55 10.63C4.55 10.6 3 12.23 3 14.25C3 16.87 4.57 19 6.5 19Z"
+                                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                                            stroke-linejoin="round" />
+                                                    </svg>
                                                 </button>
+
+                                                @if (auth()->user()->role === 'admin')
+                                                    <form action="{{ route('admin.documents.destroy', $document) }}" method="POST"
+                                                        onsubmit="return confirm('Hapus riwayat PB ini? Data PB01 dan PB02 yang terkait juga akan dihapus.');"
+                                                        style="display: inline;">
+                                                        @csrf
+                                                        @method('DELETE')
+
+                                                        <button type="submit" class="action-button action-delete" title="Hapus"
+                                                            aria-label="Hapus">
+                                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                                                xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M4 7H20" stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" />
+                                                                <path d="M10 11V17M14 11V17" stroke="currentColor" stroke-width="2"
+                                                                    stroke-linecap="round" />
+                                                                <path d="M6 7L7 20H17L18 7" stroke="currentColor" stroke-width="2"
+                                                                    stroke-linejoin="round" />
+                                                                <path d="M9 7V4H15V7" stroke="currentColor" stroke-width="2"
+                                                                    stroke-linejoin="round" />
+                                                            </svg>
+                                                        </button>
+                                                    </form>
+                                                @endif
+
                                             </div>
                                         </td>
                                     </tr>
